@@ -1,2 +1,5 @@
-# Exclure node_modules dans "/api"
+# api/
 api/node_modules
+
+# public/
+public/taches-app/node_modules
