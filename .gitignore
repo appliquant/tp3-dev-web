@@ -1,0 +1,2 @@
+# Exclure node_modules dans "/api"
+api/node_modules
