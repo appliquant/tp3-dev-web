@@ -36,10 +36,11 @@ const emit = defineEmits<{
   word-wrap: break-word;
   max-height: 12em;
   overflow: auto;
+  cursor: pointer;
 }
 
 .board__icons {
-  display: flex;
+  display: inline-block;
   margin-bottom: 1em;
   cursor: pointer;
   user-select: none;

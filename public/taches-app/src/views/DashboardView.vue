@@ -274,10 +274,9 @@ main {
   flex-wrap: wrap;
   margin-bottom: 2em;
 }
-
 .container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(15em, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(15em, 1fr));
   gap: 2em;
 }
 </style>
