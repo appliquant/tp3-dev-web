@@ -11,6 +11,13 @@ const routes = [
     path: '/connexion',
     name: 'connexion',
     component: () => import('../views/auth/ConnexionView.vue')
+  },
+
+  // erorr 404
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'not-found',
+    component: () => import('../views/Erreur404.vue')
   }
 ]
 

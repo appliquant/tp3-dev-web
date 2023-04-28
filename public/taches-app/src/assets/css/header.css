@@ -1,0 +1,32 @@
+header {
+  display: flex;
+  height: var(--header-height);
+  background-color: var(--primary-color);
+  border-bottom: 0.1em solid #80808066;
+}
+
+header nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-left: 5em;
+}
+
+header a {
+  color: var(--tertiary-color);
+  text-decoration: none;
+  margin-right: 1em;
+  font-size: 1.5em;
+}
+
+header a:hover {
+  text-decoration: underline;
+}
+
+header .logo {
+  font-size: 2em;
+  font-weight: bolder;
+  margin-right: 1em;
+  color: var(--secondary-color);
+  text-shadow: 0 0 10px var(--secondary-color);
+}
