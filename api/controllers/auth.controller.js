@@ -96,13 +96,17 @@ exports.inscription = async (req, res, next) => {
       return res.status(400).json({ message: errValidation.message });
     }
 
-    // Verifier si l'utilisateur existe déjà (avec courriel unique)
-    const utilisateurExiste = await Utilisateur.findOne({ courriel: courriel });
-    if (utilisateurExiste) {
-      return res.status(400).json({ message: "L'utilisateur existe déjà." });
+    // Verifier si courriel existe déjà (avec courriel unique)
+    const emailExiste = await Utilisateur.findOne({ courriel: courriel });
+    if (emailExiste) {
+      return res.status(400).json({ message: "Un utilisateur avec ce courriel existe déjà." });
     }
 
-    // TODO : Vérifier si le nom existe déjà (avec nom unique)
+    // Vérifier si le nom existe déjà (avec nom unique)
+    const nomExiste = await Utilisateur.findOne({ nom: nom });
+    if (nomExiste) {
+      return res.status(400).json({ message: "Un utilisateur avec ce nom existe déjà." });
+    }
 
     // Hasher le mot de passe
     const hash = await hasherMotDePasse(motDePasse);
