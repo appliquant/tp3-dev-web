@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import './auth.css'
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { useTableauStore } from '@/stores/store'
+
+const router = useRouter()
+
+const store = useTableauStore()
 
 const courriel = ref('')
 const motDePasse = ref('')
@@ -9,9 +15,16 @@ const erreurApi = ref('')
 const API_URL = import.meta.env.VITE_API_URL
 
 /**
+ * Naviguer vers dashboard
+ */
+const goToDashboard = () => {
+  router.push({ name: 'dashboard', query: {} })
+}
+
+/**
  * Fonction pour se connecter.
  */
-const seConnecter = async () => {
+const handleLogin = async () => {
   if (!courriel.value || !motDePasse.value) {
     return
   }
@@ -40,13 +53,30 @@ const seConnecter = async () => {
     if (reponse.ok) {
       // Enregister le jwt token
       const jwt = reponse.headers.get('Authorization')
+      if (!jwt) {
+        erreurApi.value = 'Token non disponible.'
+        return
+      }
+
+      store.setJwt(jwt)
+
       // Rediriger vers le dashboard
+      goToDashboard()
     }
   } catch (err) {
     console.error(`err : ${err}`)
     erreurApi.value = 'Une erreur est survenue.'
   }
 }
+
+/**
+ * Vérifier si l'utilisateur est déjà connecté.
+ */
+onMounted(() => {
+  if (store.getJwt()) {
+    goToDashboard()
+  }
+})
 </script>
 
 <template>
@@ -82,7 +112,7 @@ const seConnecter = async () => {
 
         <p class="erreur">{{ erreurApi }}</p>
 
-        <button class="button--primary" type="submit" @click.prevent="seConnecter">
+        <button class="button--primary" type="submit" @click.prevent="handleLogin">
           Se connecter
         </button>
       </form>

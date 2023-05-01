@@ -7,13 +7,20 @@ const routes = [
     name: 'inscription',
     component: () => import('../views/auth/InscriptionView.vue')
   },
+
   {
     path: '/connexion',
     name: 'connexion',
     component: () => import('../views/auth/ConnexionView.vue')
   },
 
-  // erorr 404
+  {
+    path: '/dashboard',
+    name: 'dashboard',
+    component: () => import('@/views/DashboardView.vue')
+  },
+
+  // Erreur 404
   {
     path: '/:pathMatch(.*)*',
     name: 'not-found',

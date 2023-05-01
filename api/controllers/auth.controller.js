@@ -102,6 +102,8 @@ exports.inscription = async (req, res, next) => {
       return res.status(400).json({ message: "L'utilisateur existe déjà." });
     }
 
+    // TODO : Vérifier si le nom existe déjà (avec nom unique)
+
     // Hasher le mot de passe
     const hash = await hasherMotDePasse(motDePasse);
 
