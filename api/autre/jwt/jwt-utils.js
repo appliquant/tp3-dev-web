@@ -15,4 +15,16 @@ const signJwt = async (payload) => {
   }
 };
 
-module.exports = { signJwt };
+/**
+ * Vérifier si un token JWT est valide
+ * @param {string} jwt Token jwt à vérifier
+ */
+const verifierJwt = async (tokenJwt) => {
+  try {
+    return Promise.resolve(jwt.verify(tokenJwt, process.env.SECRET_JWT));
+  } catch (err) {
+    throw err;
+  }
+};
+
+module.exports = { signJwt, verifierJwt };

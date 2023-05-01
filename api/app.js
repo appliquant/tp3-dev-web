@@ -29,8 +29,8 @@ app.use((req, res, next) => {
 
 // Importe les routes
 const authRoutes = require("./routes/auth.route");
+const tableauRoutes = require("./routes/tableau.route");
 const utilisateurRoutes = require("./routes/utilisateur");
-const tableauRoutes = require("./routes/tableau");
 const listeRoutes = require("./routes/liste");
 const carteRoutes = require("./routes/carte");
 

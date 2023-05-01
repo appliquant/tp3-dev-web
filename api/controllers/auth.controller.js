@@ -2,12 +2,11 @@
 
 const dotenv = require("dotenv");
 dotenv.config();
-// const url_base = process.env.URL + ":" + process.env.PORT;
 
+const GenererMessageErreur = require("../autre/generer-message-erreur");
 const champsManquants = require("../autre/champs-manquants");
 const { schemaInscription, schemaConnexion } = require("../autre/validations/auth/validation-auth");
 const { hasherMotDePasse, verifierHash } = require("../autre/bcrypt/bcrypt-utils");
-const GenererMessageErreur = require("../autre/generer-message-erreur");
 const { signJwt } = require("../autre/jwt/jwt-utils");
 
 const Utilisateur = require("../models/utilisateur");
