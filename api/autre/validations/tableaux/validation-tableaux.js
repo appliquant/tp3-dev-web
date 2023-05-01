@@ -5,6 +5,7 @@ const Joi = require("joi");
  */
 const schemaCreationTableau = Joi.object({
   titre: Joi.string()
+    .trim()
     .min(1)
     .max(50)
     .required()

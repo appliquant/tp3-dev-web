@@ -29,7 +29,7 @@ exports.createTableau = async (req, res, next) => {
     }
 
     // Validations
-    const { error: errValidation } = schemaCreationTableau.validate({
+    const { error: errValidation, value } = schemaCreationTableau.validate({
       titre,
     });
 
@@ -61,7 +61,24 @@ exports.createTableau = async (req, res, next) => {
   }
 };
 
-exports.getTableaux = (req, res, next) => {};
+exports.getTableaux = async (req, res, next) => {
+  try {
+    // Vérifier que l'utilisateur existe
+    const utilisateur = await Utilisateur.findById(req.utilisateurId);
+    if (!utilisateur) {
+      return res.status(400).json({ message: "Utilisateur inexistant." });
+    }
+
+    // Récupérer les tableaux de l'utilisateur
+    const tableaux = await Tableau.find({ proprietaire: req.utilisateurId });
+
+    // Retourner les tableaux
+    res.status(200).json(tableaux);
+  } catch (err) {
+    console.error(GenererMessageErreur(__filename, err));
+    next(err);
+  }
+};
 
 exports.getTableau = (req, res, next) => {};
 
