@@ -17,8 +17,6 @@ exports.createTableau = async (req, res, next) => {
     // Récupérer les données du formulaire
     const { titre } = req.body;
 
-    console.log(`titre: ${titre}, utilisateur : ${req.utilisateurId}`);
-
     // Vérifier si les données sont présentes
     const errChamps = champsManquants({
       titre: titre,
@@ -29,7 +27,7 @@ exports.createTableau = async (req, res, next) => {
     }
 
     // Validations
-    const { error: errValidation, value } = schemaCreationTableau.validate({
+    const { error: errValidation } = schemaCreationTableau.validate({
       titre,
     });
 
@@ -54,7 +52,7 @@ exports.createTableau = async (req, res, next) => {
     await tableau.save();
 
     // Retourner un message de succès
-    res.status(201).json({ message: "Tableau créé." });
+    res.status(201).json({ message: "Tableau créé.", id: tableau._id });
   } catch (err) {
     console.error(GenererMessageErreur(__filename, err));
     next(err);
@@ -80,7 +78,44 @@ exports.getTableaux = async (req, res, next) => {
   }
 };
 
-exports.getTableau = (req, res, next) => {};
+exports.getTableau = async (req, res, next) => {
+  try {
+    // Récupérer l'id du tableau
+    const tableauId = req.params.tableauId;
+
+    // Vérifier si les données sont présentes
+    const errChamps = champsManquants({
+      titre: titre,
+    });
+
+    if (errChamps.length > 0) {
+      return res.status(400).json({ message: `Champs manquants : ${errChamps.join(", ")}.` });
+    }
+
+    // Chercher tableau
+    const tableau = await Tableau.findById(tableauId);
+    if (!tableau) {
+      return res.status(400).json({ message: "Tableau inexistant." });
+    }
+
+    // Veririfer que l'utilisateur existe
+    const utilisateur = await Utilisateur.findById(req.utilisateurId);
+    if (!utilisateur) {
+      return res.status(400).json({ message: "Utilisateur inexistant." });
+    }
+
+    // Verifier que le proprietaire est l'utilisateur
+    if (tableau.proprietaire.toString() !== utilisateur._id.toString()) {
+      return res.status(403).json({ message: "Vous n'êtes pas le propriétaire de ce tableau." });
+    }
+
+    // Retourner le tableau
+    res.status(200).json(tableau);
+  } catch (err) {
+    console.error(GenererMessageErreur(__filename, err));
+    next(err);
+  }
+};
 
 exports.updateTableau = (req, res, next) => {};
 
