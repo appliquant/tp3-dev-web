@@ -55,7 +55,7 @@ exports.connexion = async (req, res, next) => {
     const jwt = await signJwt({ id: utilisateur._id });
 
     // Retourner token jwt
-    res.setHeader("Authorization", jwt);
+    res.setHeader("Authorization", `Bearer ${jwt}`);
     res.status(200).json({ message: "Utilisateur connecté." });
   } catch (err) {
     console.error(GenererMessageErreur(__filename, err));
