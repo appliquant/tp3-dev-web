@@ -76,7 +76,7 @@ const handleLogin = async () => {
  */
 onMounted(() => {
   if (store.getJwt()) {
-    goToDashboard()
+    return goToDashboard()
   }
 
   // Verifier si message de succès dans le query string /inscription?successMessage=...
