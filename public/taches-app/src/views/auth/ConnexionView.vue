@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import './auth.css'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useTableauStore } from '@/stores/store'
 
@@ -13,6 +13,14 @@ const passwd = ref('')
 
 const successApi = ref('')
 const errApi = ref('')
+
+const showErrApi = computed(() => {
+  if (errApi.value) {
+    successApi.value = ''
+  }
+
+  return errApi.value
+})
 
 const API_URL = import.meta.env.VITE_API_URL
 
@@ -90,6 +98,7 @@ onMounted(() => {
   if (errMessage as string) {
     const msg = (successMessage as string).slice(0, 220) // Limiter la longueur du message
     errApi.value = decodeURIComponent(msg)
+    successApi.value = ''
   }
 })
 </script>
@@ -125,7 +134,7 @@ onMounted(() => {
           autocomplete="current-password"
         />
 
-        <p class="erreur">{{ errApi }}</p>
+        <p class="error">{{ showErrApi }}</p>
         <p class="success">{{ successApi }}</p>
 
         <button class="button--primary" type="submit" @click.prevent="handleLogin">
