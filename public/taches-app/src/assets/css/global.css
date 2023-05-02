@@ -38,7 +38,19 @@ p {
   font-size: 1em;
 }
 
-.button--primary {
+p.success {
+  color: var(--secondary-color);
+  font-size: 0.8em;
+  margin-bottom: 0.5em;
+}
+
+p.error {
+  color: var(--color-red);
+  font-size: 0.8em;
+  margin-bottom: 0.5em;
+}
+
+button.button--primary {
   color: var(--primary-color);
   border: none;
   background-color: var(--secondary-color);
@@ -48,6 +60,6 @@ p {
   cursor: pointer;
 }
 
-.button--primary:hover {
+button.button--primary:hover {
   opacity: 0.8;
 }

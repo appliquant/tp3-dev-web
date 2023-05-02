@@ -8,9 +8,11 @@ const router = useRouter()
 
 const store = useTableauStore()
 
-const courriel = ref('')
-const motDePasse = ref('')
-const erreurApi = ref('')
+const email = ref('')
+const passwd = ref('')
+
+const successApi = ref('')
+const errApi = ref('')
 
 const API_URL = import.meta.env.VITE_API_URL
 
@@ -25,7 +27,7 @@ const goToDashboard = () => {
  * Fonction pour se connecter.
  */
 const handleLogin = async () => {
-  if (!courriel.value || !motDePasse.value) {
+  if (!email.value || !passwd.value) {
     return
   }
 
@@ -37,8 +39,8 @@ const handleLogin = async () => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        courriel: courriel.value,
-        motDePasse: motDePasse.value
+        courriel: email.value,
+        motDePasse: passwd.value
       })
     }
 
@@ -46,7 +48,7 @@ const handleLogin = async () => {
     const json = await reponse.json()
 
     if (reponse.ok === false) {
-      erreurApi.value = json.message
+      errApi.value = json.message
       return
     }
 
@@ -54,7 +56,7 @@ const handleLogin = async () => {
       // Enregister le jwt token
       const jwt = reponse.headers.get('Authorization')
       if (!jwt) {
-        erreurApi.value = 'Token non disponible.'
+        errApi.value = 'Token non disponible.'
         return
       }
 
@@ -65,7 +67,7 @@ const handleLogin = async () => {
     }
   } catch (err) {
     console.error(`err : ${err}`)
-    erreurApi.value = 'Une erreur est survenue.'
+    errApi.value = 'Une erreur est survenue.'
   }
 }
 
@@ -75,6 +77,19 @@ const handleLogin = async () => {
 onMounted(() => {
   if (store.getJwt()) {
     goToDashboard()
+  }
+
+  // Verifier si message de succès dans le query string /inscription?successMessage=...
+  const successMessage = router.currentRoute.value.query.successMessage
+  const errMessage = router.currentRoute.value.query.errMessage
+  if (successMessage as string) {
+    const msg = (successMessage as string).slice(0, 220) // Limiter la longueur du message
+    successApi.value = decodeURIComponent(msg)
+  }
+
+  if (errMessage as string) {
+    const msg = (successMessage as string).slice(0, 220) // Limiter la longueur du message
+    errApi.value = decodeURIComponent(msg)
   }
 })
 </script>
@@ -91,7 +106,7 @@ onMounted(() => {
           type="email"
           id="courriel"
           placeholder="123@email.com"
-          v-model="courriel"
+          v-model="email"
           minlength="0"
           maxlength="50"
           required
@@ -103,14 +118,15 @@ onMounted(() => {
           type="password"
           id="motDePasse"
           placeholder="******"
-          v-model="motDePasse"
+          v-model="passwd"
           minlength="6"
           maxlength="50"
           required
           autocomplete="current-password"
         />
 
-        <p class="erreur">{{ erreurApi }}</p>
+        <p class="erreur">{{ errApi }}</p>
+        <p class="success">{{ successApi }}</p>
 
         <button class="button--primary" type="submit" @click.prevent="handleLogin">
           Se connecter
