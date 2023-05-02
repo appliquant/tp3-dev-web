@@ -99,6 +99,52 @@ exports.getTableau = async (req, res, next) => {
   }
 };
 
-exports.updateTableau = (req, res, next) => {};
+exports.updateTableau = async (req, res, next) => {
+  try {
+    // Récupérer infos du formulaire
+    const { titre } = req.body;
+    const tableauId = req.params.tableauId;
+
+    // Vérifier si les données sont présentes
+    const errChamps = champsManquants({
+      tableauId: tableauId,
+      titre: titre,
+    });
+
+    if (errChamps.length > 0) {
+      return res.status(400).json({ message: `Champs manquants : ${errChamps.join(", ")}.` });
+    }
+
+    // Validations
+    const { error: errValidation } = schemaCreationTableau.validate({
+      titre,
+    });
+
+    if (errValidation) {
+      return res.status(400).json({ message: errValidation.message });
+    }
+
+    // Chercher tableau
+    const tableau = await Tableau.findById(tableauId);
+    if (!tableau) {
+      return res.status(404).json({ message: "Tableau inexistant." });
+    }
+
+    // Verifier que le proprietaire est l'utilisateur
+    if (tableau.proprietaire.toString() !== req.utilisateurId.toString()) {
+      return res.status(403).json({ message: "Vous n'êtes pas le propriétaire de ce tableau." });
+    }
+
+    // Modifier le tableau
+    tableau.titre = titre;
+    await tableau.save();
+
+    // Retourner un message de succès
+    res.status(201).json(tableau);
+  } catch (err) {
+    console.error(GenererMessageErreur(__filename, err));
+    next(err);
+  }
+};
 
 exports.deleteTableau = (req, res, next) => {};
