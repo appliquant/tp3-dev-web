@@ -35,12 +35,6 @@ exports.createTableau = async (req, res, next) => {
       return res.status(400).json({ message: errValidation.message });
     }
 
-    // Vérifier que l'utilisateur existe
-    const utilisateur = await Utilisateur.findById(req.utilisateurId);
-    if (!utilisateur) {
-      return res.status(400).json({ message: "Utilisateur inexistant." });
-    }
-
     // Créer le tableau
     const tableau = new Tableau({
       titre: titre,
@@ -61,12 +55,6 @@ exports.createTableau = async (req, res, next) => {
 
 exports.getTableaux = async (req, res, next) => {
   try {
-    // Vérifier que l'utilisateur existe
-    const utilisateur = await Utilisateur.findById(req.utilisateurId);
-    if (!utilisateur) {
-      return res.status(400).json({ message: "Utilisateur inexistant." });
-    }
-
     // Récupérer les tableaux de l'utilisateur
     const tableaux = await Tableau.find({ proprietaire: req.utilisateurId });
 
@@ -85,7 +73,7 @@ exports.getTableau = async (req, res, next) => {
 
     // Vérifier si les données sont présentes
     const errChamps = champsManquants({
-      titre: titre,
+      tableauId: tableauId,
     });
 
     if (errChamps.length > 0) {
@@ -95,17 +83,11 @@ exports.getTableau = async (req, res, next) => {
     // Chercher tableau
     const tableau = await Tableau.findById(tableauId);
     if (!tableau) {
-      return res.status(400).json({ message: "Tableau inexistant." });
-    }
-
-    // Veririfer que l'utilisateur existe
-    const utilisateur = await Utilisateur.findById(req.utilisateurId);
-    if (!utilisateur) {
-      return res.status(400).json({ message: "Utilisateur inexistant." });
+      return res.status(404).json({ message: "Tableau inexistant." });
     }
 
     // Verifier que le proprietaire est l'utilisateur
-    if (tableau.proprietaire.toString() !== utilisateur._id.toString()) {
+    if (tableau.proprietaire.toString() !== req.utilisateurId.toString()) {
       return res.status(403).json({ message: "Vous n'êtes pas le propriétaire de ce tableau." });
     }
 

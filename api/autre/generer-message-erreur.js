@@ -1,4 +1,4 @@
-var colors = require('colors/safe');
+var colors = require("colors/safe");
 
 /**
  * Génère un message d'erreur stylé
@@ -8,9 +8,9 @@ var colors = require('colors/safe');
  * @returns {string} Retourne un message d'erreur
  */
 const GenererMessageErreur = (constanteFilename, messageErreur) => {
-  let nomFichier = constanteFilename.split("/").pop()
+  let nomFichier = constanteFilename.split("/").pop();
   nomFichier = colors.red.underline(`[${nomFichier}] erreur`);
   return `${nomFichier} : ${messageErreur}`;
-}
+};
 
 module.exports = GenererMessageErreur;
