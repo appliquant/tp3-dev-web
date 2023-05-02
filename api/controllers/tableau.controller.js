@@ -147,4 +147,49 @@ exports.updateTableau = async (req, res, next) => {
   }
 };
 
-exports.deleteTableau = (req, res, next) => {};
+exports.deleteTableau = async (req, res, next) => {
+  try {
+    // Récupérer l'id du tableau
+    const tableauId = req.params.tableauId;
+
+    // Vérifier si les données sont présentes
+    const errChamps = champsManquants({
+      tableauId: tableauId,
+    });
+
+    if (errChamps.length > 0) {
+      return res.status(400).json({ message: `Champs manquants : ${errChamps.join(", ")}.` });
+    }
+
+    // Chercher tableau
+    const tableau = await Tableau.findById(tableauId);
+
+    if (!tableau) {
+      return res.status(404).json({ message: "Tableau inexistant." });
+    }
+
+    // Verifier que le proprietaire est l'utilisateur
+    if (tableau.proprietaire.toString() !== req.utilisateurId.toString()) {
+      return res.status(403).json({ message: "Vous n'êtes pas le propriétaire de ce tableau." });
+    }
+
+    // Trouver les listes et les cartes du tableau
+    const listes = await Liste.find({ tableau: tableauId });
+    const idListes = listes.map((liste) => liste._id); // id des listes du tableau
+
+    // Supprimer les cartes et les listes
+    await Promise.all([
+      await Carte.deleteMany({ liste: { $in: [...idListes] } }),
+      await Liste.deleteMany({ tableau: tableauId }),
+    ]);
+
+    // Supprimer le tableau
+    await tableau.deleteOne();
+
+    // Retourner un message de succès
+    res.status(200).json({ message: "Tableau supprimé.", id: tableau._id });
+  } catch (err) {
+    console.error(GenererMessageErreur(__filename, err));
+    next(err);
+  }
+};
