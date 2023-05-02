@@ -56,7 +56,7 @@ exports.connexion = async (req, res, next) => {
 
     // Retourner token jwt
     res.setHeader("Authorization", jwt);
-    res.status(201).json({ message: "Utilisateur connecté." });
+    res.status(200).json({ message: "Utilisateur connecté." });
   } catch (err) {
     console.error(GenererMessageErreur(__filename, err));
     next(err);
