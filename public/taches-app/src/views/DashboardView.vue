@@ -5,17 +5,24 @@ import { onMounted, reactive, ref } from 'vue'
 import { useTableauStore } from '@/stores/store'
 import Tableau from '@/components/Tableau.vue'
 import AddIcon from '@/components/icons/AddIcon.vue'
+import Modal from '@/components/Modal.vue'
 import type { PropsTableau } from '@/props/PropTableau'
 
 const router = useRouter()
 const store = useTableauStore()
 
 const isLoading = ref(true)
+const newBoard = ref('')
 const userData = reactive({
   tableaux: [] as PropsTableau[]
 })
 
 const API_URL = import.meta.env.VITE_API_URL
+
+/**
+ * Afficher ou non le modal
+ */
+const showModal = ref(false)
 
 /**
  * Trouver données de l'utilisateur
@@ -76,8 +83,29 @@ onMounted(() => {
   <main>
     <div class="header-section">
       <h1>Tableaux</h1>
-      <AddIcon class="icon icon--add" />
+      <AddIcon class="icon icon--add" @click="showModal = !showModal" />
+
+      <!-- Modal ajout tableau -->
+      <Teleport to="body">
+        <modal :show="showModal">
+          <template #header>
+            <h2>Ajouter un tableau</h2>
+          </template>
+
+          <template #body>
+            <form>
+              <input type="text" minlength="1" maxlength="50" required v-bind="newBoard" />
+            </form>
+          </template>
+
+          <template #footer>
+            <button class="button--primary">Ajouter</button>
+            <button class="button--secondary">Annuler</button>
+          </template>
+        </modal>
+      </Teleport>
     </div>
+
     <div class="container">
       <Tableau
         v-for="tableau in userData.tableaux"

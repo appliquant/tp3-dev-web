@@ -34,6 +34,10 @@ h1 {
   margin-bottom: 1rem;
 }
 
+h2 {
+  margin-bottom: 1em;
+}
+
 p {
   max-width: 60ch;
   font-size: 1em;
