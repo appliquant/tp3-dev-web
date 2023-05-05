@@ -22,7 +22,8 @@ body {
     Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   font-size: 1rem;
   line-height: 1.5;
-  color: var(--primary-color);
+  color: var(--tertiary-color);
+
   background-color: var(--primary-color);
 }
 
@@ -61,5 +62,16 @@ button.button--primary {
 }
 
 button.button--primary:hover {
+  opacity: 0.8;
+}
+
+.icon {
+  width: 3em;
+  height: 3em;
+  cursor: pointer;
+  user-select: none;
+}
+
+.icon:hover {
   opacity: 0.8;
 }

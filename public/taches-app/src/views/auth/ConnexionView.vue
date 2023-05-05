@@ -14,6 +14,10 @@ const passwd = ref('')
 const successApi = ref('')
 const errApi = ref('')
 
+/**
+ * Affiche le message d'erreur.
+ * Efface le message de succès si un message d'erreur est définit.
+ */
 const showErrApi = computed(() => {
   if (errApi.value) {
     successApi.value = ''
@@ -25,7 +29,7 @@ const showErrApi = computed(() => {
 const API_URL = import.meta.env.VITE_API_URL
 
 /**
- * Naviguer vers dashboard
+ * Naviguer vers dashboard.
  */
 const goToDashboard = () => {
   router.push({ name: 'dashboard', query: {} })
@@ -79,10 +83,8 @@ const handleLogin = async () => {
   }
 }
 
-/**
- * Vérifier si l'utilisateur est déjà connecté.
- */
 onMounted(() => {
+  // Vérifier si l'utilisateur est déjà connecté.
   if (store.getJwt()) {
     return goToDashboard()
   }
@@ -90,13 +92,14 @@ onMounted(() => {
   // Verifier si message de succès dans le query string /inscription?successMessage=...
   const successMessage = router.currentRoute.value.query.successMessage
   const errMessage = router.currentRoute.value.query.errMessage
+
   if (successMessage as string) {
     const msg = (successMessage as string).slice(0, 220) // Limiter la longueur du message
     successApi.value = decodeURIComponent(msg)
   }
 
   if (errMessage as string) {
-    const msg = (successMessage as string).slice(0, 220) // Limiter la longueur du message
+    const msg = (errMessage as string).slice(0, 220) // Limiter la longueur du message
     errApi.value = decodeURIComponent(msg)
     successApi.value = ''
   }

@@ -1,0 +1,46 @@
+<script setup lang="ts">
+import RemoveIcon from './icons/RemoveIcon.vue'
+// https://vuejs.org/guide/typescript/composition-api.html#syntax-limitations
+const props = defineProps<{
+  _id: string
+  titre: string
+  proprietaire: string
+  listes: []
+}>()
+
+const deleteBoard = async () => {
+  alert(1)
+}
+</script>
+
+<template>
+  <div class="board">
+    <div class="board__icons">
+      <RemoveIcon class="icon board__icon--delete" @click="deleteBoard" />
+    </div>
+    <div class="board__title">{{ props.titre }}</div>
+  </div>
+</template>
+
+<style scoped>
+.board {
+  border: 0.1em solid var(--secondary-color);
+  border-radius: 0.3em;
+  width: 15em;
+  padding: 1em;
+  word-wrap: break-word;
+  max-height: 12em;
+  overflow: auto;
+}
+
+.board__icons {
+  display: flex;
+  margin-bottom: 1em;
+  cursor: pointer;
+  user-select: none;
+}
+.board__icon--delete {
+  width: 1.5em;
+  height: 1.5em;
+}
+</style>
