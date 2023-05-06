@@ -12,6 +12,9 @@ import './assets/css/global.css'
     </nav>
   </header>
 
+  <!-- Notifications de '@kyvg/vue3-notification-->
+  <notifications position="center" />
+
   <RouterView />
 </template>
 

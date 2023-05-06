@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import RemoveIcon from './icons/RemoveIcon.vue'
+
 // https://vuejs.org/guide/typescript/composition-api.html#syntax-limitations
 const props = defineProps<{
   _id: string
@@ -8,15 +9,19 @@ const props = defineProps<{
   listes: []
 }>()
 
-const deleteBoard = async () => {
-  alert(1)
-}
+const emit = defineEmits<{
+  /**
+   * Événement émis lors de la supression d'un tableau
+   * @param id - Identifiant du tableau à supprimer
+   */
+  (e: 'delete', id: string): void
+}>()
 </script>
 
 <template>
   <div class="board">
     <div class="board__icons">
-      <RemoveIcon class="icon board__icon--delete" @click="deleteBoard" />
+      <RemoveIcon class="icon board__icon--delete" @click="$emit('delete', props._id)" />
     </div>
     <div class="board__title">{{ props.titre }}</div>
   </div>

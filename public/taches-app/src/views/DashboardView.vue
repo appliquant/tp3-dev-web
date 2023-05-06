@@ -2,7 +2,9 @@
 import { useRouter } from 'vue-router'
 import { onMounted, reactive, ref } from 'vue'
 
+import { useNotification } from '@kyvg/vue3-notification'
 import { useTableauStore } from '@/stores/store'
+
 import Tableau from '@/components/Tableau.vue'
 import AddIcon from '@/components/icons/AddIcon.vue'
 import Modal from '@/components/Modal.vue'
@@ -12,6 +14,7 @@ const API_URL = import.meta.env.VITE_API_URL
 
 const router = useRouter()
 const store = useTableauStore()
+const notification = useNotification()
 
 const isLoading = ref(true)
 const userData = reactive({
@@ -28,7 +31,7 @@ const modalSuccessMessage = ref('')
 const showModal = ref(false)
 
 /**
- * Trouver données de l'utilisateur
+ * Récupérer données de l'utilisateur
  */
 const fetchUserInfo = async () => {
   try {
@@ -122,6 +125,64 @@ const addBoard = async () => {
 }
 
 /**
+ * Supprimer un tableau
+ * @param idTableau - Identifiant du tableau à supprimer
+ */
+const deleteBoard = async (idTableau: string) => {
+  try {
+    const conf = confirm('Voulez-vous vraiment supprimer ce tableau?')
+    if (!conf) {
+      return false
+    }
+
+    const jwt = store.getJwt()
+    if (!jwt) {
+      return redirectToLoginPage()
+    }
+
+    const params = {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: jwt
+      }
+    }
+
+    // Requête
+    const req = await fetch(`${API_URL}/tableaux/${idTableau}`, params)
+    const response = await req.json()
+
+    // Si il y a une erreur
+    if (req.ok === false) {
+      if (req.status === 500) {
+        return redirectToLoginPage()
+      }
+
+      return notification.notify({
+        title: 'Suppression du tableau',
+        text: `Une erreur est survenue : ${response.message}`,
+        type: 'error',
+        duration: 5000
+      })
+    }
+
+    // Message de succès
+    notification.notify({
+      title: 'Suppression du tableau',
+      text: 'Le tableau a été supprimé avec succès',
+      type: 'success',
+      duration: 3000
+    })
+
+    // Retirer tableau de la liste (sans recharger les tableaux)
+    const index = userData.tableaux.findIndex((tableau) => tableau._id === idTableau)
+    userData.tableaux.splice(index, 1)
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+/**
  * Rediriger vers page de connexion
  */
 const redirectToLoginPage = (errMessage?: string) => {
@@ -183,6 +244,7 @@ onMounted(() => {
         :titre="tableau.titre"
         :proprietaire="tableau.proprietaire"
         :listes="tableau.listes"
+        @delete="(idTableau) => deleteBoard(idTableau)"
       />
     </div>
   </main>
