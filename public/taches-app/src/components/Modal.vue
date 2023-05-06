@@ -1,20 +1,37 @@
 <script setup lang="ts">
 // Source : https://vuejs.org/examples/#modal
 
+import RemoveIcon from '@/components/icons/RemoveIcon.vue'
+
 const props = defineProps({
   /**
    * Afficher ou non le modal
    */
-  show: Boolean
+  show: Boolean,
+
+  /**
+   * Message d'erreur à afficher sur le modal
+   */
+  errorMessage: String,
+
+  /**
+   * Message de succès à afficher sur le modal
+   */
+  successMessage: String
 })
 
 // defineEmits(['close'])
 
 const emit = defineEmits<{
   /**
-   * Event émis lors de la fermeture du modal
+   * Événement émis lors de la fermeture du modal
    */
   (e: 'close'): void
+
+  /**
+   * Événement émis lors de l'ajout d'un tableau
+   */
+  (e: 'add'): void
 }>()
 </script>
 
@@ -24,7 +41,8 @@ const emit = defineEmits<{
       <div class="modal-container">
         <!-- Header -->
         <div class="modal-header">
-          <slot name="header">default header</slot>
+          <h2>Ajouter un tableau</h2>
+          <RemoveIcon class="icon icon--remove" @click="$emit('close')" />
         </div>
 
         <!-- Body -->
@@ -35,8 +53,17 @@ const emit = defineEmits<{
         <!-- Footer -->
         <div class="modal-footer">
           <slot name="footer">
-            default footer
-            <button class="button--primary" @click="$emit('close')">OK</button>
+            <!-- Afficher message d'erreur-->
+            <p v-if="props.errorMessage && props.errorMessage.length > 0" class="error">
+              {{ props.errorMessage }}
+            </p>
+
+            <!-- Afficher message de succès-->
+            <p v-if="props.successMessage && props.successMessage.length > 0" class="success">
+              {{ props.successMessage }}
+            </p>
+
+            <button class="button--primary" @click="$emit('add')">Ajouter</button>
           </slot>
         </div>
       </div>
@@ -64,6 +91,19 @@ const emit = defineEmits<{
   background-color: var(--primary-color);
   border-radius: 0.3em;
   transition: all 0.3s ease;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.icon--remove {
+  width: 1.7em;
+  height: 1.7em;
+  margin-left: auto;
+  align-self: baseline;
 }
 
 .modal-enter-from {
