@@ -1,5 +1,4 @@
-import InscriptionView from '@/views/auth/InscriptionView.vue'
-import { createRouter, createWebHashHistory, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
 
 const routes = [
   {
@@ -18,6 +17,12 @@ const routes = [
     path: '/tableaux',
     name: 'dashboard',
     component: () => import('@/views/DashboardView.vue')
+  },
+
+  {
+    path: '/tableaux/:tableauId',
+    name: 'tableau',
+    component: () => import('@/views/TableauView.vue')
   },
 
   // Erreur 404

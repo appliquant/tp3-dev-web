@@ -186,11 +186,11 @@ const deleteBoard = async (idTableau: string) => {
 /**
  * Navigation vers page de tableau
  */
-const navigateToBoard = (idTableau: string) => {
-  // return router.push({
-  //   name: 'tableau',
-  //   params: { idTableau }
-  // })
+const navigateToBoard = (tableauId: string) => {
+  return router.push({
+    name: 'tableau',
+    params: { tableauId }
+  })
 }
 
 /**
