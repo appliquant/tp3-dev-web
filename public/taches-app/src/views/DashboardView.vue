@@ -26,7 +26,7 @@ const modalErrorMessage = ref('')
 const modalSuccessMessage = ref('')
 
 /**
- * Afficher ou non le modal
+ * Afficher ou non le modal d'ajout de tableau
  */
 const showModal = ref(false)
 
@@ -68,6 +68,7 @@ const fetchUserInfo = async () => {
     isLoading.value = false
   } catch (err) {
     console.error(err)
+    isLoading.value = true
   }
 }
 
@@ -183,6 +184,16 @@ const deleteBoard = async (idTableau: string) => {
 }
 
 /**
+ * Navigation vers page de tableau
+ */
+const navigateToBoard = (idTableau: string) => {
+  // return router.push({
+  //   name: 'tableau',
+  //   params: { idTableau }
+  // })
+}
+
+/**
  * Rediriger vers page de connexion
  */
 const redirectToLoginPage = (errMessage?: string) => {
@@ -245,6 +256,7 @@ onMounted(() => {
         :proprietaire="tableau.proprietaire"
         :listes="tableau.listes"
         @delete="(idTableau) => deleteBoard(idTableau)"
+        v-on:click="navigateToBoard(tableau._id)"
       />
     </div>
   </main>

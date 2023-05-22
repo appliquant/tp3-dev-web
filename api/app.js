@@ -30,8 +30,8 @@ app.use((req, res, next) => {
 // Importe les routes
 const authRoutes = require("./routes/auth.route");
 const tableauRoutes = require("./routes/tableau.route");
+const listeRoutes = require("./routes/liste.route");
 const utilisateurRoutes = require("./routes/utilisateur");
-const listeRoutes = require("./routes/liste");
 const carteRoutes = require("./routes/carte");
 
 // Utilisation des routes en tant que middleware
