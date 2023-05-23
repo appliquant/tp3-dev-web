@@ -101,10 +101,8 @@ const fetchBoardInfo = async () => {
     if (!req.ok) {
       if (req.status === 401) {
         return redirectToLoginPage()
-      } else if (req.status === 404) {
-        error.value = response.message
       } else {
-        return redirectToLoginPage()
+        return (error.value = response.message)
       }
     }
 
@@ -114,7 +112,12 @@ const fetchBoardInfo = async () => {
     // Appel des fonctions pour récupérer les informations sur les listes
     fetchBoardLists()
   } catch (err) {
-    console.error(err)
+    notification.notify({
+      title: 'Récupération des informations du tableau',
+      text: `Une erreur est survenue`,
+      type: 'error',
+      duration: 5000
+    })
   }
 }
 
@@ -142,7 +145,16 @@ const fetchBoardLists = async () => {
     const response = await req.json()
 
     if (!req.ok) {
-      return redirectToLoginPage()
+      if (req.status === 401) {
+        return redirectToLoginPage()
+      } else {
+        return notification.notify({
+          title: 'Récupération des listes',
+          text: `Une erreur est survenue : ${response.message}`,
+          type: 'error',
+          duration: 5000
+        })
+      }
     }
 
     // Enregistrer données des listes
@@ -151,7 +163,12 @@ const fetchBoardLists = async () => {
     // État de chargement
     isLoading.value = false
   } catch (err) {
-    console.error(err)
+    notification.notify({
+      title: 'Récupération des listes',
+      text: `Une erreur est survenue`,
+      type: 'error',
+      duration: 5000
+    })
   }
 }
 
@@ -190,15 +207,13 @@ const handleAddList = async () => {
     if (!req.ok) {
       if (req.status === 401) {
         return redirectToLoginPage()
-      } else if (req.status === 404) {
+      } else {
         return notification.notify({
           title: "Ajout d'une liste tableau",
           text: `Une erreur est survenue : ${response.message}`,
           type: 'error',
           duration: 5000
         })
-      } else {
-        return redirectToLoginPage()
       }
     }
 

@@ -58,7 +58,15 @@ const fetchUserInfo = async () => {
 
     // Vérifier s'il y a une erreur
     if (req.ok === false) {
-      return redirectToLoginPage()
+      if (req.status === 401) {
+        return redirectToLoginPage()
+      }
+      return notification.notify({
+        title: "Récupération des informations sur l'utilisateur",
+        text: `Une erreur est survenue : ${response.message}`,
+        type: 'error',
+        duration: 5000
+      })
     }
 
     // Assigner données
@@ -67,8 +75,13 @@ const fetchUserInfo = async () => {
     // Loading indicator
     isLoading.value = false
   } catch (err) {
-    console.error(err)
     isLoading.value = true
+    notification.notify({
+      title: "Récupération des informations sur l'utilisateur",
+      text: `Une erreur est survenue : ${err}`,
+      type: 'error',
+      duration: 5000
+    })
   }
 }
 
@@ -108,12 +121,12 @@ const addBoard = async () => {
     const response = await req.json()
 
     if (req.ok === false) {
-      if (req.status === 500) {
+      if (req.status === 401) {
         return redirectToLoginPage()
+      } else {
+        // Afficher message d'erreur
+        return (modalErrorMessage.value = response.message)
       }
-
-      // Afficher message d'erreur
-      modalErrorMessage.value = response.message
     }
 
     // Afficher message de succès
@@ -121,7 +134,13 @@ const addBoard = async () => {
 
     console.log(response)
   } catch (err) {
-    console.error(err)
+    notification.notify({
+      title: 'Ajout du tableau',
+      text: `Une erreur est survenue : ${err}`,
+      type: 'error',
+      duration: 5000
+    })
+    modalErrorMessage.value = err!.toString()
   }
 }
 
@@ -155,7 +174,7 @@ const deleteBoard = async (idTableau: string) => {
 
     // Si il y a une erreur
     if (req.ok === false) {
-      if (req.status === 500) {
+      if (req.status === 401) {
         return redirectToLoginPage()
       }
 
@@ -179,7 +198,12 @@ const deleteBoard = async (idTableau: string) => {
     const index = userData.tableaux.findIndex((tableau) => tableau._id === idTableau)
     userData.tableaux.splice(index, 1)
   } catch (err) {
-    console.error(err)
+    notification.notify({
+      title: 'Suppression du tableau',
+      text: `Une erreur est survenue : ${err}`,
+      type: 'error',
+      duration: 5000
+    })
   }
 }
 
