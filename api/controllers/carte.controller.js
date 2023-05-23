@@ -274,4 +274,65 @@ exports.updateCarte = async (req, res, next) => {
   }
 };
 
-exports.deleteCarte = (req, res, next) => {};
+exports.deleteCarte = async (req, res, next) => {
+  try {
+    // Récupérer les données du formulaire
+    const { tableauId, listeId, carteId } = req.params;
+
+    // Vérifier si les données sont présentes
+    const errChamps = champsManquants({
+      tableauId: tableauId,
+      listeId: listeId,
+      carteId: carteId,
+    });
+
+    if (errChamps.length > 0) {
+      return res.status(400).json({ message: `Champs manquants : ${errChamps.join(", ")}.` });
+    }
+
+    // Trouver tableau
+    const tableau = await Tableau.findById(tableauId);
+    if (!tableau) {
+      return res.status(404).json({ message: "Tableau non trouvé." });
+    }
+
+    // Vérifier que le propriétaire du tableau est l'utilisateur
+    if (tableau.proprietaire.toString() !== req.utilisateurId) {
+      return res.status(403).json({ message: "Vous n'êtes pas autorisé à supprimer cette carte." });
+    }
+
+    // Trouver liste
+    const liste = await Liste.findById(listeId);
+    if (!liste) {
+      return res.status(404).json({ message: "Liste non trouvée." });
+    }
+
+    // Vérifier que la liste appartient au tableau
+    if (liste.tableau.toString() !== tableauId) {
+      return res.status(403).json({ message: "Cette liste n'appartient pas au tableau." });
+    }
+
+    // Trouver carte
+    const carte = await Carte.findById(carteId);
+    if (!carte) {
+      return res.status(404).json({ message: "Carte non trouvée." });
+    }
+
+    // Vérifier que la carte appartient à la liste
+    if (carte.liste.toString() !== listeId) {
+      return res.status(403).json({ message: "Cette carte n'appartient pas à cette liste." });
+    }
+
+    // Supprimer la carte
+    await carte.deleteOne();
+
+    // Retirer la carte de la liste
+    await Liste.updateOne({ _id: listeId }, { $pull: { cartes: carteId } });
+
+    // Retourner un message de succès
+    res.status(200).json({ message: "Carte supprimée avec succès.", id: carte._id });
+  } catch (err) {
+    console.error(genererMessageErreur(__filename, err));
+    next(err);
+  }
+};

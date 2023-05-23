@@ -257,7 +257,7 @@ exports.deleteListe = async (req, res, next) => {
     await liste.deleteOne();
 
     // Retourner un message de succès
-    res.status(200).json({ message: "Liste supprimée." });
+    res.status(200).json({ message: "Liste supprimée.", id: liste._id });
   } catch (err) {
     console.error(genererMessageErreur(__filename, err));
     next(err);

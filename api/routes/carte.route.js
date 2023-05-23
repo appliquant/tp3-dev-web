@@ -31,6 +31,10 @@ router.put(
 );
 
 // DELETE => /tableaux/:tableauId/listes/:listeId/cartes/:carteId
-router.delete("/tableaux/:tableauId/listes/:listeId/cartes/:carteId", carteController.deleteCarte);
+router.delete(
+  "/tableaux/:tableauId/listes/:listeId/cartes/:carteId",
+  [estConnecte, utilisateurExiste],
+  carteController.deleteCarte
+);
 
 module.exports = router;
