@@ -253,7 +253,7 @@ onMounted(() => {
           :success-message="modalSuccessMessage"
         >
           <template #body>
-            <form>
+            <form @submit.prevent="">
               <label for="title"></label>
               <input
                 id="title"
@@ -280,7 +280,7 @@ onMounted(() => {
         :proprietaire="tableau.proprietaire"
         :listes="tableau.listes"
         @delete="(idTableau) => deleteBoard(idTableau)"
-        v-on:click="navigateToBoard(tableau._id)"
+        @clicked="navigateToBoard(tableau._id)"
       />
     </div>
   </main>

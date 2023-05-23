@@ -11,6 +11,12 @@ const emit = defineEmits<{
    * @param id - Identifiant du tableau à supprimer
    */
   (e: 'delete', id: string): void
+
+  /**
+   * Événement émis lors du clic sur un tableau
+   * Utilisé pour empêcher d'aller à la page /tableau/:id quand on clique sur le bouton de suppression
+   */
+  (e: 'clicked'): void
 }>()
 </script>
 
@@ -19,7 +25,7 @@ const emit = defineEmits<{
     <div class="board__icons">
       <RemoveIcon class="icon board__icon--delete" @click="$emit('delete', props._id)" />
     </div>
-    <div class="board__title">{{ props.titre }}</div>
+    <div @click="$emit('clicked')" class="board__title">{{ props.titre }}</div>
   </div>
 </template>
 
@@ -32,7 +38,17 @@ const emit = defineEmits<{
   word-wrap: break-word;
   max-height: 12em;
   overflow: auto;
+}
+
+.board__title {
+  font-size: 1.5em;
+  font-weight: bold;
   cursor: pointer;
+}
+
+.board__title:hover {
+  opacity: 0.8;
+  text-decoration: underline var(--secondary-color) 0.2em;
 }
 
 .board__icons {
