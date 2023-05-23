@@ -385,6 +385,7 @@ onMounted(() => {
         <form v-else v-on:submit.prevent="handleAddList" class="element-add-new-list">
           <label>
             <input
+              autofocus
               v-model="newListTitle"
               type="text"
               placeholder="Nom de la liste..."
