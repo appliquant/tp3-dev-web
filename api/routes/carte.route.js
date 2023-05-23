@@ -14,7 +14,7 @@ router.post(
 );
 
 // GET => /tableaux/:tableauId/listes/:listeId/cartes
-router.get("/tableaux/:tableauId/listes/:listeId/cartes", carteController.getCartes);
+router.get("/tableaux/:tableauId/listes/:listeId/cartes", [estConnecte, utilisateurExiste], carteController.getCartes);
 
 // GET => /tableaux/:tableauId/listes/:listeId/cartes/:carteId
 router.get(
