@@ -1,5 +1,5 @@
-const GenererMessageErreur = require("../generer-message-erreur");
-const { verifierJwt } = require("../jwt/jwt-utils");
+const genererMessageErreur = require("../autre/generer-message-erreur");
+const { verifierJwt } = require("../autre/jwt/jwt-utils");
 
 /**
  * Middleware qui demande qu'un utilisateur soit connecté
@@ -28,7 +28,7 @@ const estConnecte = async (req, res, next) => {
     // Passer à la suite
     next();
   } catch (err) {
-    console.error(GenererMessageErreur(__filename, err));
+    console.error(genererMessageErreur(__filename, err));
     next(err);
   }
 };

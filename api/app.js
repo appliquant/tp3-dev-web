@@ -1,9 +1,10 @@
 "use strict";
 
 const express = require("express");
-const GenererMessageErreur = require("./autre/generer-message-erreur");
 const mongoose = require("mongoose");
 const app = express();
+
+const genererMessageErreur = require("./autre/generer-message-erreur");
 
 // parse application/json
 app.use(express.json());
@@ -44,7 +45,7 @@ app.use(utilisateurRoutes);
 // Gestion des erreurs
 // "Attrappe" les erreurs envoyé par "throw"
 app.use(function (err, req, res, next) {
-  console.trace(GenererMessageErreur(__filename, err));
+  console.trace(genererMessageErreur(__filename, err));
   if (!err.statusCode) {
     err.statusCode = 500;
   }

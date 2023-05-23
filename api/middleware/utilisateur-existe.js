@@ -1,5 +1,5 @@
-const Utilisateur = require("../../models/utilisateur");
-const GenererMessageErreur = require("../generer-message-erreur");
+const Utilisateur = require("../models/utilisateur");
+const genererMessageErreur = require("../autre/generer-message-erreur");
 
 /**
  * Middleware qui vérifie si l'utilisateur existe avec l'id dans "req.utilisateurId"
@@ -9,13 +9,13 @@ const utilisateurExiste = async (req, res, next) => {
     // Vérifier que l'utilisateur existe
     const utilisateur = await Utilisateur.findById(req.utilisateurId);
     if (!utilisateur) {
-      return res.status(404).json({ message: "Utilisateur inexistant." });
+      return res.status(401);
     }
 
     // Poursuivre
     next();
   } catch (err) {
-    console.error(GenererMessageErreur(__filename, err));
+    console.error(genererMessageErreur(__filename, err));
     next(err);
   }
 };
