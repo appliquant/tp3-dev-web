@@ -195,7 +195,7 @@ const handleAddList = async () => {
         Authorization: jwt
       },
       body: JSON.stringify({
-        titre: newListTitle.value
+        titre: newListTitle.value.trim()
       })
     }
 
@@ -272,7 +272,7 @@ const handleUpdateListeTitle = async (idListe: string, title: string) => {
         Authorization: jwt
       },
       body: JSON.stringify({
-        titre: title
+        titre: title.trim()
       })
     }
 

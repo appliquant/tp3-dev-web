@@ -56,7 +56,7 @@ const resetTitle = (event: any) => {
       >
         {{ props.titre }}
       </h2>
-      <RemoveIcon class="icon list--icon--delete" />
+      <RemoveIcon tabindex="3" class="icon list--icon--delete" />
     </div>
 
     <!-- Contenu -->
@@ -121,7 +121,7 @@ h2 {
 
 .list__button > button {
   width: 100%;
-  filter: drop-shadow(0px 0px 10px var(--secondary-color));
+  /* filter: drop-shadow(0px 0px 10px var(--secondary-color)); */
 }
 
 .list--icon--delete {

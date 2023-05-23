@@ -105,6 +105,10 @@ button.button--primary:hover {
   opacity: 0.8;
 }
 
+svg:focus {
+  outline: var(--primary-color) solid 0.3em;
+}
+
 /*
   ////////////////////////////////////
   // Content editable
