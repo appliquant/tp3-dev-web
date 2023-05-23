@@ -6,7 +6,7 @@ import './assets/css/global.css'
 <template>
   <header>
     <nav>
-      <RouterLink to="/" class="logo">Tableaux</RouterLink>
+      <RouterLink to="/tableaux" class="logo">Tableaux</RouterLink>
       <RouterLink to="/inscription">Inscription</RouterLink>
       <RouterLink to="/connexion">Connexion</RouterLink>
     </nav>

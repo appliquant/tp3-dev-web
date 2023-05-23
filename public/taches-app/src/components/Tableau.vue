@@ -1,13 +1,9 @@
 <script setup lang="ts">
 import RemoveIcon from './icons/RemoveIcon.vue'
+import type { PropsTableau } from '@/props/PropTableau'
 
 // https://vuejs.org/guide/typescript/composition-api.html#syntax-limitations
-const props = defineProps<{
-  _id: string
-  titre: string
-  proprietaire: string
-  listes: []
-}>()
+const props = defineProps<PropsTableau>()
 
 const emit = defineEmits<{
   /**
