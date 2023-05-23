@@ -17,7 +17,11 @@ const props = defineProps<PropsListe>()
     </div>
 
     <!-- Contenu -->
-    <ul class="list__content"></ul>
+    <ul class="list__content">
+      <li class="list__content__container">
+        <p>yo</p>
+      </li>
+    </ul>
 
     <!-- Ajout carte -->
     <div class="list__button">

@@ -3,7 +3,9 @@ import { useRoute, useRouter } from 'vue-router'
 import { ref, onMounted, reactive, computed } from 'vue'
 
 import { useTableauStore } from '@/stores/store'
+
 import Liste from '@/components/Liste.vue'
+import RemoveIconVue from '@/components/icons/RemoveIcon.vue'
 import type { PropsTableau } from '@/props/PropTableau'
 import type { PropsListe } from '@/props/PropsListe'
 
@@ -23,17 +25,27 @@ const tableauId = ref(route.params.tableauId)
 const isLoading = ref(true)
 
 /**
+ * Afficher ou non l'élément d'ajout de liste
+ */
+const showAddListElement = ref(false)
+
+/**
+ * Titre de la nouvelle liste
+ */
+const newListTitle = ref('')
+
+/**
+ * Erreur de chargement
+ */
+const error = ref('')
+
+/**
  * Vérifier si le tableau est chargé
  * Utilisé dans le html pour afficher le contenu principal
  */
 const isLoaded = computed(() => {
   return isLoading.value === false
 })
-
-/**
- * Erreur de chargement
- */
-const error = ref('')
 
 /**
  * Données du tableau
@@ -190,15 +202,39 @@ onMounted(() => {
       </div>
     </div>
 
+    <!-- modal ajout liste -->
+
     <!-- listes -->
     <ul class="horizontal-lists-container">
       <li v-for="list in boardData.lists">
         <Liste :_id="list._id" :titre="list.titre" :tableau="list.tableau" />
       </li>
 
+      <!-- bouton ajouter liste -->
       <li>
-        <!-- bouton ajouter -->
-        <button class="button--primary">Nouvelle liste</button>
+        <button
+          v-if="showAddListElement === false"
+          class="button--primary"
+          @click="showAddListElement = !showAddListElement"
+        >
+          Nouvelle liste
+        </button>
+
+        <form v-else class="element-add-new-list">
+          <label>
+            <input
+              v-bind="newListTitle"
+              type="text"
+              placeholder="Nom de la liste..."
+              autocomplete="off"
+            />
+          </label>
+
+          <div>
+            <button class="button--primary">Ajouter liste</button>
+            <RemoveIconVue class="icon" @click="showAddListElement = !showAddListElement" />
+          </div>
+        </form>
       </li>
     </ul>
   </main>
@@ -251,5 +287,24 @@ h1 {
 .horizontal-lists-container li {
   list-style: none;
   padding: 0;
+}
+
+.element-add-new-list {
+  background-color: var(--color-gray-light);
+  border-radius: 0.4em;
+  padding: 1em;
+  list-style: none;
+}
+
+.element-add-new-list div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1em;
+}
+
+.element-add-new-list div svg {
+  width: 2.2em;
+  height: 2.2em;
 }
 </style>
