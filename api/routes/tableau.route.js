@@ -3,8 +3,9 @@
 const express = require("express");
 const router = express.Router();
 
-const estConnecte = require("../autre/middleware/est-connecte");
-const utilisateurExiste = require("../autre/middleware/utilisateur-existe");
+const estConnecte = require("../middleware/est-connecte");
+const utilisateurExiste = require("../middleware/utilisateur-existe");
+
 const tableauController = require("../controllers/tableau.controller");
 
 // POST => /tableaux
