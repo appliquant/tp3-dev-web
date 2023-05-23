@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { ref } from 'vue'
+
 import RemoveIcon from '@/components/icons/RemoveIcon.vue'
 import type { PropsListe } from '@/props/PropsListe'
 
@@ -6,13 +8,54 @@ import type { PropsListe } from '@/props/PropsListe'
  * Props de la liste
  */
 const props = defineProps<PropsListe>()
+
+/**
+ * Événements émis par la liste
+ */
+const emit = defineEmits<{
+  /**
+   * Émis quand le titre est modifié
+   * @param listId Id de la liste
+   * @param title Nouveau titre
+   */
+  (e: 'updateListTitle', listId: string, title: string): void
+}>()
+
+/**
+ * Gère le changement de titre de la liste (lors du clic sur "Enter")
+ * @param event Événement
+ */
+const handleListTitleChanged = (event: any) => {
+  // Émettre l'événement
+  emit('updateListTitle', props._id, event.srcElement.innerText)
+
+  // Retirer focus
+  event.srcElement.blur()
+}
+
+/**
+ * Remet le titre de la liste à sa valeur initiale (lors du clic sur "Escape")
+ * @param event Événement
+ */
+const resetTitle = (event: any) => {
+  event.srcElement.innerText = props.titre
+}
 </script>
 
 <template>
   <div class="list">
     <!-- Header -->
     <div class="list__header">
-      <h2>{{ props.titre }}</h2>
+      <h2
+        @keyup.enter="handleListTitleChanged($event)"
+        @keyup.escape="resetTitle($event)"
+        @blur="resetTitle($event)"
+        ref="listTitle"
+        class="content-editable"
+        contenteditable="true"
+      >
+        {{ props.titre }}
+      </h2>
       <RemoveIcon class="icon list--icon--delete" />
     </div>
 

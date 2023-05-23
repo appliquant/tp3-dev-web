@@ -80,3 +80,23 @@ button.button--primary:hover {
 .icon:hover {
   opacity: 0.8;
 }
+
+.content-editable {
+  cursor: pointer;
+  padding: 0.3em;
+  user-select: none;
+}
+
+.content-editable:hover,
+.content-editable:focus {
+  opacity: 0.8;
+  background-color: var(--color-gray-light);
+  border-radius: 0.4em;
+  transition: 0.1s ease-in-out;
+  border: 0.1em solid var(--color-gray);
+  outline: none;
+}
+
+.content-editable::selection {
+  background-color: var(--color-gray-light);
+}

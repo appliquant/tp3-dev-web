@@ -231,6 +231,74 @@ const handleAddList = async () => {
   }
 }
 
+/**
+ * Mettre à jour le titre d'une liste
+ * @param idListe Id de la liste
+ * @param title Nouveau titre
+ */
+const handleUpdateListeTitle = async (idListe: string, title: string) => {
+  try {
+    // Validations
+    if (title.trim().length < 1) {
+      return alert('Le titre de la liste ne peut pas être vide')
+    }
+
+    // Trouver jwt
+    const jwt = store.getJwt()
+
+    if (!jwt) {
+      return redirectToLoginPage()
+    }
+
+    const params = {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: jwt
+      },
+      body: JSON.stringify({
+        titre: title
+      })
+    }
+
+    // Requête
+    const req = await fetch(`${API_URL}/tableaux/${tableauId.value}/listes/${idListe}`, params)
+    const response = await req.json()
+
+    // Vérifier s'il y a une erreur
+    if (!req.ok) {
+      if (req.status === 401) {
+        return redirectToLoginPage()
+      } else {
+        return notification.notify({
+          title: "Mise à jour du titre d'une liste",
+          text: `Une erreur est survenue : ${response.message}`,
+          type: 'error',
+          duration: 5000
+        })
+      }
+    }
+
+    // Mettre à jour le titre de la liste
+    const listIndex = boardData.lists.findIndex((list) => list._id === idListe)
+    boardData.lists[listIndex].titre = title
+
+    return notification.notify({
+      title: "Mise à jour du titre d'une liste",
+      text: `Titre mis à jour`,
+      type: 'success',
+      duration: 5000
+    })
+  } catch (err) {
+    notification.notify({
+      title: "Mise à jour du titre d'une liste",
+      text: `Une erreur est survenue`,
+      type: 'error',
+      duration: 5000
+    })
+  }
+}
+
 // Afficher informations du tableau à l'initialisation de la vue
 onMounted(() => {
   fetchBoardInfo()
@@ -283,7 +351,12 @@ onMounted(() => {
     <!-- listes -->
     <ul class="horizontal-lists-container">
       <li v-for="list in boardData.lists">
-        <Liste :_id="list._id" :titre="list.titre" :tableau="list.tableau" />
+        <Liste
+          :_id="list._id"
+          :titre="list.titre"
+          :tableau="list.tableau"
+          @update-list-title="(idListe, title:string) => handleUpdateListeTitle(idListe, title)"
+        />
       </li>
 
       <!-- bouton ajouter liste -->

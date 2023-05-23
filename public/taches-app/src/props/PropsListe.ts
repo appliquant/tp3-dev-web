@@ -1,14 +1,14 @@
 /**
- * Represente un tableau
+ * Represente une liste
  */
 export interface PropsListe {
   /**
-   * Identifiant du tableau
+   * Identifiant de la liste
    */
   _id: string
 
   /**
-   * Titre du tableau
+   * Titre de la liste
    */
   titre: string
 
