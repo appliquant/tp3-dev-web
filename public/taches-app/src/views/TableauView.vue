@@ -3,6 +3,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { ref, onMounted, reactive, computed } from 'vue'
 
 import { useTableauStore } from '@/stores/store'
+import { useNotification } from '@kyvg/vue3-notification'
 
 import Liste from '@/components/Liste.vue'
 import RemoveIconVue from '@/components/icons/RemoveIcon.vue'
@@ -13,6 +14,7 @@ const API_URL = import.meta.env.VITE_API_URL
 const router = useRouter()
 const route = useRoute()
 const store = useTableauStore()
+const notification = useNotification()
 
 /**
  * Id du tableau
@@ -153,6 +155,82 @@ const fetchBoardLists = async () => {
   }
 }
 
+/**
+ * Ajouter une liste dans la base de données
+ */
+const handleAddList = async () => {
+  try {
+    // Validations
+    if (newListTitle.value.trim().length < 1) {
+      return alert('Le titre de la liste ne peut pas être vide')
+    }
+
+    // Trouver jwt
+    const jwt = store.getJwt()
+    if (!jwt) {
+      return redirectToLoginPage()
+    }
+
+    const params = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: jwt
+      },
+      body: JSON.stringify({
+        titre: newListTitle.value
+      })
+    }
+
+    // Requête
+    const req = await fetch(`${API_URL}/tableaux/${tableauId.value}/listes`, params)
+    const response = await req.json()
+
+    // Vérifier s'il y a une erreur
+    if (!req.ok) {
+      if (req.status === 401) {
+        return redirectToLoginPage()
+      } else if (req.status === 404) {
+        return notification.notify({
+          title: "Ajout d'une liste tableau",
+          text: `Une erreur est survenue : ${response.message}`,
+          type: 'error',
+          duration: 5000
+        })
+      } else {
+        return redirectToLoginPage()
+      }
+    }
+
+    // Ajouter liste dans le tableau
+    boardData.lists.push({
+      _id: response.id,
+      titre: newListTitle.value,
+      tableau: tableauId.value.toString()
+    })
+
+    // Réinitialiser titre de la nouvelle liste
+    newListTitle.value = ''
+
+    // Cacher l'élément d'ajout de liste
+    showAddListElement.value = false
+
+    return notification.notify({
+      title: "Ajout d'une liste tableau",
+      text: `Liste ajoutée`,
+      type: 'success',
+      duration: 5000
+    })
+  } catch (err) {
+    return notification.notify({
+      title: "Ajout d'une liste tableau",
+      text: `Une erreur est survenue`,
+      type: 'error',
+      duration: 5000
+    })
+  }
+}
+
 // Afficher informations du tableau à l'initialisation de la vue
 onMounted(() => {
   fetchBoardInfo()
@@ -202,8 +280,6 @@ onMounted(() => {
       </div>
     </div>
 
-    <!-- modal ajout liste -->
-
     <!-- listes -->
     <ul class="horizontal-lists-container">
       <li v-for="list in boardData.lists">
@@ -212,18 +288,16 @@ onMounted(() => {
 
       <!-- bouton ajouter liste -->
       <li>
-        <button
-          v-if="showAddListElement === false"
-          class="button--primary"
-          @click="showAddListElement = !showAddListElement"
-        >
-          Nouvelle liste
-        </button>
+        <div v-if="showAddListElement === false" class="element-add-new-list">
+          <button class="button--primary" @click="showAddListElement = !showAddListElement">
+            Nouvelle liste
+          </button>
+        </div>
 
-        <form v-else class="element-add-new-list">
+        <form v-else v-on:submit.prevent="handleAddList" class="element-add-new-list">
           <label>
             <input
-              v-bind="newListTitle"
+              v-model="newListTitle"
               type="text"
               placeholder="Nom de la liste..."
               autocomplete="off"
@@ -294,6 +368,7 @@ h1 {
   border-radius: 0.4em;
   padding: 1em;
   list-style: none;
+  transition: all 1s ease-in-out;
 }
 
 .element-add-new-list div {
