@@ -9,7 +9,7 @@ const schemaCreationCarte = Joi.object({
     .min(1)
     .max(50)
     .required()
-    .error(new Error("La carte doit contenir entre 1 et 50 caractères.")),
+    .error(new Error("La titre doit contenir entre 1 et 50 caractères.")),
 
   description: Joi.string()
     .trim()

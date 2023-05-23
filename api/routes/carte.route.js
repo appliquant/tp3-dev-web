@@ -24,7 +24,11 @@ router.get(
 );
 
 // PUT => /tableaux/:tableauId/listes/:listeId/cartes/:carteId
-router.put("/tableaux/:tableauId/listes/:listeId/cartes/:carteId", carteController.updateCarte);
+router.put(
+  "/tableaux/:tableauId/listes/:listeId/cartes/:carteId",
+  [estConnecte, utilisateurExiste],
+  carteController.updateCarte
+);
 
 // DELETE => /tableaux/:tableauId/listes/:listeId/cartes/:carteId
 router.delete("/tableaux/:tableauId/listes/:listeId/cartes/:carteId", carteController.deleteCarte);

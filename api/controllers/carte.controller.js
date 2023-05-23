@@ -194,6 +194,84 @@ exports.getCarte = async (req, res, next) => {
   }
 };
 
-exports.updateCarte = (req, res, next) => {};
+exports.updateCarte = async (req, res, next) => {
+  try {
+    // Récupérer les données du formulaire
+    const { titre, description, dateLimite } = req.body;
+    const { tableauId, listeId, carteId } = req.params;
+
+    // Vérifier si les données sont présentes
+    const errChamps = champsManquants({
+      tableauId: tableauId,
+      listeId: listeId,
+      carteId: carteId,
+      titre: titre,
+      description: description,
+      dateLimite: dateLimite,
+    });
+
+    if (errChamps.length > 0) {
+      return res.status(400).json({ message: `Champs manquants : ${errChamps.join(", ")}.` });
+    }
+
+    // Validations
+    const { error: errValidation } = schemaCreationCarte.validate({
+      titre,
+      description,
+      dateLimite,
+    });
+
+    if (errValidation) {
+      return res.status(400).json({ message: errValidation.message });
+    }
+
+    // Trouver tableau
+    const tableau = await Tableau.findById(tableauId);
+    if (!tableau) {
+      return res.status(404).json({ message: "Tableau non trouvé." });
+    }
+
+    // Vérifier que le propriétaire du tableau est l'utilisateur
+    if (tableau.proprietaire.toString() !== req.utilisateurId) {
+      return res.status(403).json({ message: "Vous n'êtes pas autorisé à modifier cette carte." });
+    }
+
+    // Trouver liste
+    const liste = await Liste.findById(listeId);
+    if (!liste) {
+      return res.status(404).json({ message: "Liste non trouvée." });
+    }
+
+    // Vérifier que la liste appartient au tableau
+    if (liste.tableau.toString() !== tableauId) {
+      return res.status(403).json({ message: "Cette liste n'appartient pas au tableau." });
+    }
+
+    // Trouver carte
+    const carte = await Carte.findById(carteId);
+    if (!carte) {
+      return res.status(404).json({ message: "Carte non trouvée." });
+    }
+
+    // Vérifier que la carte appartient à la liste
+    if (carte.liste.toString() !== listeId) {
+      return res.status(403).json({ message: "Cette carte n'appartient pas à cette liste." });
+    }
+
+    // Modifier la carte
+    carte.titre = titre;
+    carte.description = description;
+    carte.dateLimite = dateLimite;
+
+    // Sauvegarder la carte
+    await carte.save();
+
+    // Retourner la carte
+    res.status(201).json(carte);
+  } catch (err) {
+    console.error(genererMessageErreur(__filename, err));
+    next(err);
+  }
+};
 
 exports.deleteCarte = (req, res, next) => {};
