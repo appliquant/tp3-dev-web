@@ -1,10 +1,17 @@
 const express = require("express");
 const router = express.Router();
-const carteController = require("../controllers/carteController");
 
+const estConnecte = require("../autre/middleware/est-connecte");
+const utilisateurExiste = require("../autre/middleware/utilisateur-existe");
+
+const carteController = require("../controllers/carte.controller");
 
 // POST => /tableaux/:tableauId/listes/:listeId/cartes
-router.post("/tableaux/:tableauId/listes/:listeId/cartes", carteController.createCarte);
+router.post(
+  "/tableaux/:tableauId/listes/:listeId/cartes",
+  [estConnecte, utilisateurExiste],
+  carteController.createCarte
+);
 
 // GET => /tableaux/:tableauId/listes/:listeId/cartes
 router.get("/tableaux/:tableauId/listes/:listeId/cartes", carteController.getCartes);
