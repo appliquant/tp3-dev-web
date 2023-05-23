@@ -17,7 +17,11 @@ router.post(
 router.get("/tableaux/:tableauId/listes/:listeId/cartes", carteController.getCartes);
 
 // GET => /tableaux/:tableauId/listes/:listeId/cartes/:carteId
-router.get("/tableaux/:tableauId/listes/:listeId/cartes/:carteId", carteController.getCarte);
+router.get(
+  "/tableaux/:tableauId/listes/:listeId/cartes/:carteId",
+  [estConnecte, utilisateurExiste],
+  carteController.getCarte
+);
 
 // PUT => /tableaux/:tableauId/listes/:listeId/cartes/:carteId
 router.put("/tableaux/:tableauId/listes/:listeId/cartes/:carteId", carteController.updateCarte);
