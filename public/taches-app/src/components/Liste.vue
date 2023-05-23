@@ -15,10 +15,16 @@ const props = defineProps<PropsListe>()
 const emit = defineEmits<{
   /**
    * Émis quand le titre est modifié
-   * @param listId Id de la liste
+   * @param listId Id de la liste à modifier
    * @param title Nouveau titre
    */
   (e: 'updateListTitle', listId: string, title: string): void
+
+  /**
+   * Émis quand l'utilisateur clique sur le bouton de suppression de la liste
+   * @param listId Id de la liste à supprimer
+   */
+  (e: 'deleteList', listId: string): void
 }>()
 
 /**
@@ -53,10 +59,15 @@ const resetTitle = (event: any) => {
         ref="listTitle"
         class="content-editable"
         contenteditable="true"
+        spellcheck="false"
       >
         {{ props.titre }}
       </h2>
-      <RemoveIcon tabindex="3" class="icon list--icon--delete" />
+      <RemoveIcon
+        tabindex="3"
+        class="icon list--icon--delete"
+        @click="emit('deleteList', props._id)"
+      />
     </div>
 
     <!-- Contenu -->

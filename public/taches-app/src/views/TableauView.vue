@@ -314,6 +314,74 @@ const handleUpdateListeTitle = async (idListe: string, title: string) => {
   }
 }
 
+/**
+ * Supprimer une liste
+ * @param idList Id de la liste à supprimer
+ */
+const handleDeleteList = async (idList: string) => {
+  try {
+    // Validations
+    if (idList.trim().length < 1) {
+      return alert('Id de la liste invalide')
+    }
+
+    const conf = confirm('Voulez-vous vraiment supprimer cette liste ?')
+    if (!conf) {
+      return false
+    }
+
+    // Trouver jwt
+    const jwt = store.getJwt()
+    if (!jwt) {
+      return redirectToLoginPage()
+    }
+
+    const params = {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: jwt
+      }
+    }
+
+    // Requête
+    const req = await fetch(`${API_URL}/tableaux/${tableauId.value}/listes/${idList}`, params)
+    const response = await req.json()
+
+    // Vérifier s'il y a une erreur
+    if (!req.ok) {
+      if (req.status === 401) {
+        return redirectToLoginPage()
+      }
+
+      return notification.notify({
+        title: "Suppression d'une liste",
+        text: `Une erreur est survenue : ${response.message}`,
+        type: 'error',
+        duration: 5000
+      })
+    }
+
+    // Supprimer la liste localement
+    const listIndex = boardData.lists.findIndex((list) => list._id === idList)
+    boardData.lists.splice(listIndex, 1)
+
+    return notification.notify({
+      title: "Suppression d'une liste",
+      text: `Liste supprimée`,
+      type: 'success',
+      duration: 5000
+    })
+  } catch (err) {
+    notification.notify({
+      title: "Suppression d'une liste",
+      text: `Une erreur est survenue`,
+      type: 'error',
+      duration: 5000
+    })
+  }
+}
+
 // Afficher informations du tableau à l'initialisation de la vue
 onMounted(() => {
   fetchBoardInfo()
@@ -370,7 +438,8 @@ onMounted(() => {
           :_id="list._id"
           :titre="list.titre"
           :tableau="list.tableau"
-          @update-list-title="(idListe, title:string) => handleUpdateListeTitle(idListe, title)"
+          @update-list-title="(idList, title:string) => handleUpdateListeTitle(idList, title)"
+          @delete-list="(idList) => handleDeleteList(idList)"
         />
       </li>
 
