@@ -9,7 +9,7 @@ const utilisateurExiste = async (req, res, next) => {
     // Vérifier que l'utilisateur existe
     const utilisateur = await Utilisateur.findById(req.utilisateurId);
     if (!utilisateur) {
-      return res.status(401);
+      return res.status(401).json("Utilisateur n'existe pas");
     }
 
     // Poursuivre
