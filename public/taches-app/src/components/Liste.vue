@@ -288,7 +288,7 @@ onMounted(() => {
 
     <!-- Contenu -->
     <ul class="list__content">
-      <li class="list__content__container" v-for="card in cards.cards">
+      <li class="list__content container" v-for="card in cards.cards">
         <Carte
           :_id="card._id"
           :titre="card.titre"
@@ -379,12 +379,17 @@ h2 {
   display: none;
 }
 
-.list__content__container {
+.list__content .container {
+  cursor: pointer;
   background-color: var(--color-gray-light);
   border-radius: 0.4em;
   padding: 1em;
   margin: 1em auto 1em auto;
   list-style: none;
+}
+
+.list__content .container:hover {
+  opacity: 0.8;
 }
 
 /*
