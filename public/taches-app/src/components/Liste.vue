@@ -6,6 +6,8 @@ import { useTableauStore } from '@/stores/store'
 import { useNotification } from '@kyvg/vue3-notification'
 
 import RemoveIcon from '@/components/icons/RemoveIcon.vue'
+import Carte from './Carte.vue'
+
 import type { PropsListe } from '@/props/PropsListe'
 import type { PropsCarte } from '@/props/PropsCarte'
 
@@ -243,6 +245,11 @@ onMounted(() => {
   <div class="list">
     <!-- Header -->
     <div class="list__header">
+      <RemoveIcon
+        tabindex="3"
+        class="icon list--icon--delete"
+        @click="emit('deleteList', props._id)"
+      />
       <h2
         @keyup.enter="handleListTitleChanged($event)"
         @keyup.escape="resetListTitle($event)"
@@ -254,18 +261,18 @@ onMounted(() => {
       >
         {{ props.titre }}
       </h2>
-      <RemoveIcon
-        tabindex="3"
-        class="icon list--icon--delete"
-        @click="emit('deleteList', props._id)"
-      />
     </div>
 
     <!-- Contenu -->
     <ul class="list__content">
       <li class="list__content__container" v-for="card in cards.cards">
-        <p>{{ card.titre }}</p>
-        <p>{{ new Intl.DateTimeFormat('fr-CA').format(new Date(card.dateLimite)) }}</p>
+        <Carte
+          :_id="card._id"
+          :titre="card.titre"
+          :description="card.description"
+          :dateLimite="card.dateLimite"
+          :liste="props._id"
+        />
       </li>
     </ul>
 
@@ -304,6 +311,7 @@ onMounted(() => {
 h2 {
   margin: 0;
   word-break: break-all;
+  padding-top: 0;
 }
 
 .list {
@@ -322,25 +330,24 @@ h2 {
 */
 
 .list__header {
-  flex: 1;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  overflow-y: auto;
+  display: grid;
+  grid-template-columns: 1fr 5fr;
+  align-items: start;
+  /* overflow-y: auto; */
   max-height: 10em;
-  min-height: 3em;
+  /* min-height: 3em; */
+}
+
+.list__header::-webkit-scrollbar {
+  display: none;
 }
 
 /*
 //////////////////////////////
-// List contentÉlément ajout carte
+// List content
 //////////////////////////////
 */
-
 .list__content {
-  flex: 1;
   overflow-y: auto;
   padding: 0;
 }
@@ -362,9 +369,7 @@ h2 {
 // List footer
 //////////////////////////////
 */
-
 .list__footer {
-  flex: 1;
   padding-top: 1em;
 }
 
