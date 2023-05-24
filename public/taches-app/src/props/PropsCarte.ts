@@ -22,7 +22,7 @@ export interface PropsCarte {
   /**
    * Date limite de la carte
    */
-  dateLimite: Date
+  dateLimite: Date | null
 
   /**
    * Liste parente de la carte (identifiant)

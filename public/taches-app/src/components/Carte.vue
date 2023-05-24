@@ -10,5 +10,7 @@ const props = defineProps<PropsCarte>()
 <template>
   <!-- Contenu -->
   <p>{{ props.titre }}</p>
-  <p>{{ new Intl.DateTimeFormat('fr-CA').format(new Date(props.dateLimite)) }}</p>
+  <p v-if="props.dateLimite !== null">
+    {{ new Intl.DateTimeFormat('fr-CA').format(new Date(props.dateLimite)) }}
+  </p>
 </template>

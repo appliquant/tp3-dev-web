@@ -127,7 +127,10 @@ const handleFetchCards = async () => {
     // Ajouter les cartes à la liste
     cards.cards = response.map((resCard: any) => {
       // Parse date (ex : 2021-05-31T04:00:00.000Z -> format Date() de javascript)
-      resCard.dateLimite = new Date(resCard.dateLimite)
+      // resCard.dateLimite = new Date(resCard.dateLimite)
+      if (resCard.dateLimite !== null) {
+        resCard.dateLimite = new Date(resCard.dateLimite)
+      }
 
       return resCard
     })
@@ -158,20 +161,12 @@ const handleAddCard = async () => {
       return redirectToLoginPage()
     }
 
-    // Date (mettre dans un an par défaut)
-    const date = new Date().setFullYear(new Date().getFullYear() + 1)
-
     // Carte à ajouter
     const newCard = {
       titre: newCardTitle.value.trim(),
       description: ' ',
-      dateLimite: new Date(date).toISOString() // Date en UTC
+      dateLimite: 'null'
     }
-
-    // Add 1 year to date
-    newCard.dateLimite = new Date(
-      new Date(newCard.dateLimite).setFullYear(new Date(newCard.dateLimite).getFullYear() + 1)
-    ).toISOString()
 
     const params = {
       method: 'POST',
@@ -208,7 +203,7 @@ const handleAddCard = async () => {
       titre: newCard.titre,
       description: newCard.description,
       // @ts-ignore
-      dateLimite: newCard.dateLimite
+      dateLimite: newCard.dateLimite === 'null' ? null : newCard.dateLimite
     })
 
     // Fermer l'élément d'ajout de carte
