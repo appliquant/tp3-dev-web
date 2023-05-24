@@ -382,75 +382,6 @@ const handleDeleteList = async (idList: string) => {
   }
 }
 
-const handleAddCard = async (idList: string, cardTitle: string) => {
-  try {
-    // Validations
-    if (idList.trim().length < 1) {
-      return alert('Id de la liste invalide')
-    }
-
-    if (cardTitle.trim().length < 1) {
-      return alert('Le titre de la carte ne peut pas être vide')
-    }
-
-    // Trouver jwt
-    const jwt = store.getJwt()
-    if (!jwt) {
-      return redirectToLoginPage()
-    }
-
-    const params = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: jwt
-      },
-      body: JSON.stringify({
-        titre: cardTitle.trim(),
-        description: ' ',
-        dateLimite: new Date().toISOString() // Date en UTC
-      })
-    }
-
-    // Requête
-    const req = await fetch(
-      `${API_URL}/tableaux/${tableauId.value}/listes/${idList}/cartes`,
-      params
-    )
-    const response = await req.json()
-
-    // Vérifier s'il y a une erreur
-    if (!req.ok) {
-      if (req.status === 401) {
-        return redirectToLoginPage()
-      }
-      return notification.notify({
-        title: "Ajout d'une carte",
-        text: `Une erreur est survenue : ${response.message}`,
-        type: 'error',
-        duration: 5000
-      })
-    }
-
-    // Ajouter la carte dans la liste
-
-    // Message de succès
-    notification.notify({
-      title: "Ajout d'une carte",
-      text: `Carte ajoutée`,
-      type: 'success',
-      duration: 5000
-    })
-  } catch (err) {
-    notification.notify({
-      title: "Ajout d'une carte",
-      text: `Une erreur est survenue`,
-      type: 'error',
-      duration: 5000
-    })
-  }
-}
-
 // Afficher informations du tableau à l'initialisation de la vue
 onMounted(() => {
   fetchBoardInfo()
@@ -507,7 +438,6 @@ onMounted(() => {
           :_id="list._id"
           :titre="list.titre"
           :tableau="list.tableau"
-          @add-card="(idList, cardTitle) => handleAddCard(idList, cardTitle)"
           @update-list-title="(idList, title) => handleUpdateListeTitle(idList, title)"
           @delete-list="(idList) => handleDeleteList(idList)"
         />

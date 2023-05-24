@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { reactive, ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+
+import { useTableauStore } from '@/stores/store'
+import { useNotification } from '@kyvg/vue3-notification'
 
 import RemoveIcon from '@/components/icons/RemoveIcon.vue'
 import type { PropsListe } from '@/props/PropsListe'
+import type { PropsCarte } from '@/props/PropsCarte'
 
-/**
- * Référence vers le titre de la carte
- */
-const newCardTitle = ref('')
-
-/**
- * Afficher ou non l'élément d'ajout de carte
- */
-const showAddCardElement = ref(false)
+const API_URL = import.meta.env.VITE_API_URL
+const router = useRouter()
+const store = useTableauStore()
+const notification = useNotification()
 
 /**
  * Props de la liste
@@ -45,6 +45,171 @@ const emit = defineEmits<{
 }>()
 
 /**
+ * Cartes de la liste
+ */
+const cards = reactive({
+  cards: [] as PropsCarte[]
+})
+
+/**
+ * Référence vers le titre de la carte
+ */
+const newCardTitle = ref('')
+
+/**
+ * Afficher ou non l'élément d'ajout de carte
+ */
+const showAddCardElement = ref(false)
+
+/**
+ * Rediriger vers page de connexion
+ */
+const redirectToLoginPage = (errMessage?: string) => {
+  // Supprimer jwt
+  store.$reset()
+
+  // Redirection vers page de connexion
+  return router.push({
+    name: 'connexion',
+    query: { errMessage: errMessage ? errMessage : 'Connectez-vous pour accéder à cette ressource' }
+  })
+}
+
+/**
+ * Récupère les cartes de la liste
+ */
+const handleFetchCards = async () => {
+  try {
+    // Trouver jwt
+    const jwt = store.getJwt()
+    if (!jwt) {
+      return redirectToLoginPage()
+    }
+
+    const params = {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `${jwt}`
+      }
+    }
+
+    // Requête
+    const req = await fetch(
+      `${API_URL}/tableaux/${props.tableau}/listes/${props._id}/cartes`,
+      params
+    )
+    const response = await req.json()
+
+    // Si erreur
+    if (!req.ok) {
+      if (req.status === 401) {
+        return redirectToLoginPage(response.message)
+      }
+
+      return notification.notify({
+        title: "Ajout d'une carte",
+        text: `Une erreur est survenue : ${response.message}`,
+        type: 'error',
+        duration: 5000
+      })
+    }
+
+    // Ajouter les cartes à la liste
+    cards.cards = response
+  } catch (err) {
+    notification.notify({
+      title: 'Récupérer les cartes',
+      text: `Une erreur est survenue`,
+      type: 'error',
+      duration: 5000
+    })
+  }
+}
+
+/**
+ * Ajouter une carte dans une liste
+ * @param cardTitle Titre de la carte
+ */
+const handleAddCard = async () => {
+  try {
+    // Validations
+    if (newCardTitle.value.trim().length < 1) {
+      return alert('Le titre de la carte ne peut pas être vide')
+    }
+
+    // Trouver jwt
+    const jwt = store.getJwt()
+    if (!jwt) {
+      return redirectToLoginPage()
+    }
+
+    // Carte à ajouter
+    const newCard = {
+      titre: newCardTitle.value.trim(),
+      description: ' ',
+      dateLimite: new Date().toISOString() // Date en UTC
+    }
+
+    const params = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: jwt
+      },
+      body: JSON.stringify(newCard)
+    }
+
+    // Requête
+    const req = await fetch(
+      `${API_URL}/tableaux/${props.tableau}/listes/${props._id}/cartes`,
+      params
+    )
+    const response = await req.json()
+
+    // Vérifier s'il y a une erreur
+    if (!req.ok) {
+      if (req.status === 401) {
+        return redirectToLoginPage()
+      }
+      return notification.notify({
+        title: "Ajout d'une carte",
+        text: `Une erreur est survenue : ${response.message}`,
+        type: 'error',
+        duration: 5000
+      })
+    }
+
+    // Ajouter la carte à la liste de cartes locales
+    cards.cards.push({
+      _id: response.id!,
+      titre: newCard.titre,
+      description: newCard.description,
+      // @ts-ignore
+      dateLimite: newCard.dateLimite
+    })
+
+    // Fermer l'élément d'ajout de carte
+    showAddCardElement.value = false
+
+    // Message de succès
+    return notification.notify({
+      title: "Ajout d'une carte",
+      text: `Carte ajoutée`,
+      type: 'success',
+      duration: 5000
+    })
+  } catch (err) {
+    notification.notify({
+      title: "Ajout d'une carte",
+      text: `Une erreur est survenue`,
+      type: 'error',
+      duration: 5000
+    })
+  }
+}
+
+/**
  * Gère le changement de titre de la liste (lors du clic sur "Enter")
  * @param event Événement
  */
@@ -68,13 +233,15 @@ const resetListTitle = (event: any) => {
  * Gère l'ajout d'une carte
  * @param event
  */
-const handleAddCard = () => {
-  // Émettre l'événement
-  emit('addCard', props._id, newCardTitle.value)
+// const handleAddCard = () => {
+//   // Émettre l'événement
+//   emit('addCard', props._id, newCardTitle.value)
+// }
 
-  // Réinitialiser le titre
-  newCardTitle.value = ''
-}
+onMounted(() => {
+  // Récupérer les cartes de la liste au chargement du composant
+  handleFetchCards()
+})
 </script>
 
 <template>
@@ -101,8 +268,9 @@ const handleAddCard = () => {
 
     <!-- Contenu -->
     <ul class="list__content">
-      <li class="list__content__container">
-        <p>yo</p>
+      <li class="list__content__container" v-for="card in cards.cards">
+        <p>{{ card.titre }}</p>
+        <p>{{ new Intl.DateTimeFormat('fr-CA').format(new Date(card.dateLimite)) }}</p>
       </li>
     </ul>
 
@@ -118,18 +286,17 @@ const handleAddCard = () => {
         <form v-on:submit.prevent="handleAddCard" class="element-add-new-card">
           <label>
             <input
-              autofocus
+              autofocus="true"
               type="text"
               placeholder="Nom de la carte..."
               autocomplete="off"
               v-model="newCardTitle"
               @keyup.escape="showAddCardElement = false"
-              @keyup.enter="handleAddCard"
             />
           </label>
 
           <div>
-            <button class="button--primary" @click="handleAddCard">Ajouter carte</button>
+            <button class="button--primary">Ajouter carte</button>
             <RemoveIcon class="icon" @click="showAddCardElement = false" />
           </div>
         </form>

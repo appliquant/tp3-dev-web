@@ -1,3 +1,5 @@
+import type { PropsTableau } from './PropTableau'
+
 /**
  * Represente une liste
  */
@@ -13,7 +15,8 @@ export interface PropsListe {
   titre: string
 
   /**
-   * Tableau parent
+   * Tableau parent (identifiant)
+   * @see PropsTableau
    */
   tableau: string
 }

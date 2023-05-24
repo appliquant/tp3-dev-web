@@ -1,3 +1,5 @@
+import type { PropsListe } from './PropsListe'
+
 /**
  * Represente un tableau
  */
@@ -19,6 +21,7 @@ export interface PropsTableau {
 
   /**
    * Liste des identifiants des listes du tableau
+   * @see PropsListe
    */
   listes: []
 }
