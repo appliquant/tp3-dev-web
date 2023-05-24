@@ -5,6 +5,11 @@ import RemoveIcon from '@/components/icons/RemoveIcon.vue'
 import type { PropsListe } from '@/props/PropsListe'
 
 /**
+ * Référence vers le titre de la carte
+ */
+const newCardTitle = ref('')
+
+/**
  * Afficher ou non l'élément d'ajout de carte
  */
 const showAddCardElement = ref(false)
@@ -30,6 +35,13 @@ const emit = defineEmits<{
    * @param listId Id de la liste à supprimer
    */
   (e: 'deleteList', listId: string): void
+
+  /**
+   * Émis quand l'utilisateur clique sur le bouton d'ajout de carte
+   * @param listId Id de la liste à modifier
+   * @param cardTitle Titre de la carte à ajouter
+   */
+  (e: 'addCard', listId: string, cardTitle: string): void
 }>()
 
 /**
@@ -48,8 +60,20 @@ const handleListTitleChanged = (event: any) => {
  * Remet le titre de la liste à sa valeur initiale (lors du clic sur "Escape")
  * @param event Événement
  */
-const resetTitle = (event: any) => {
+const resetListTitle = (event: any) => {
   event.srcElement.innerText = props.titre
+}
+
+/**
+ * Gère l'ajout d'une carte
+ * @param event
+ */
+const handleAddCard = () => {
+  // Émettre l'événement
+  emit('addCard', props._id, newCardTitle.value)
+
+  // Réinitialiser le titre
+  newCardTitle.value = ''
 }
 </script>
 
@@ -59,8 +83,8 @@ const resetTitle = (event: any) => {
     <div class="list__header">
       <h2
         @keyup.enter="handleListTitleChanged($event)"
-        @keyup.escape="resetTitle($event)"
-        @blur="resetTitle($event)"
+        @keyup.escape="resetListTitle($event)"
+        @blur="resetListTitle($event)"
         ref="listTitle"
         class="content-editable"
         contenteditable="true"
@@ -91,13 +115,21 @@ const resetTitle = (event: any) => {
       </div>
 
       <div v-else>
-        <form v-on:submit.prevent="" class="element-add-new-card">
+        <form v-on:submit.prevent="handleAddCard" class="element-add-new-card">
           <label>
-            <input autofocus type="text" placeholder="Nom de la carte..." autocomplete="off" />
+            <input
+              autofocus
+              type="text"
+              placeholder="Nom de la carte..."
+              autocomplete="off"
+              v-model="newCardTitle"
+              @keyup.escape="showAddCardElement = false"
+              @keyup.enter="handleAddCard"
+            />
           </label>
 
           <div>
-            <button class="button--primary">Ajouter carte</button>
+            <button class="button--primary" @click="handleAddCard">Ajouter carte</button>
             <RemoveIcon class="icon" @click="showAddCardElement = false" />
           </div>
         </form>
