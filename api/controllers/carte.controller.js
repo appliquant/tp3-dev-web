@@ -69,7 +69,7 @@ exports.createCarte = async (req, res, next) => {
       titre: titre,
       description: description,
       liste: listeId,
-      dateLimite: dateLimite,
+      dateLimite: dateLimite === "null" ? null : dateLimite,
     });
 
     // Sauvegarder la carte

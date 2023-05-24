@@ -258,7 +258,6 @@ const resetListTitle = (event: any) => {
 watch(
   () => props.cardsFilters,
   () => {
-    console.log('props.cardsFilters', props.cardsFilters)
     handleFetchCards()
   },
   { deep: true }

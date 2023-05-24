@@ -17,7 +17,7 @@ const schemaCreationCarte = Joi.object({
     .max(500)
     .error(new Error("La description ne doit pas dépasser 500 caractères")),
 
-  dateLimite: Joi.date().error(new Error("La dateLimite doit être valide.")),
+  dateLimite: Joi.date().allow("null").error(new Error("La dateLimite doit être valide.")),
 });
 
 module.exports = { schemaCreationCarte };
