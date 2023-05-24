@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { useTableauStore } from '@/stores/store'
@@ -25,6 +25,25 @@ const props = defineProps<
     boardId: string
   }
 >()
+
+/**
+ * Propriétés qui affiche la date limite
+ */
+const cardDate = computed(() => {
+  if (!props.dateLimite) {
+    return
+  }
+
+  const date = new Date(props.dateLimite)
+  console.log(props.dateLimite)
+  console.log(date)
+
+  return new Intl.DateTimeFormat('fr-CA', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  }).format(new Date(props.dateLimite))
+})
 
 /**
  * Afficher ou non le modal
@@ -104,7 +123,9 @@ const handleUpdateCard = async () => {
       },
       body: JSON.stringify({
         ...tempCard,
-        dateLimite: tempCard.dateLimite === null ? 'null' : tempCard.dateLimite
+        // Date sauvegardées en UTC (pour éviter le décalage horaire)
+        dateLimite:
+          tempCard.dateLimite === null ? 'null' : new Date(tempCard.dateLimite).toISOString()
       })
     }
 
@@ -138,6 +159,7 @@ const handleUpdateCard = async () => {
       type: 'success'
     })
   } catch (err) {
+    console.log(err)
     return notification.notify({
       title: 'Erreur',
       text: 'Une erreur est survenue lors de la modification de la carte',
@@ -151,15 +173,7 @@ const handleUpdateCard = async () => {
   <!-- Contenu -->
   <div class="container" @click="showModal = true">
     <p>{{ props.titre }}</p>
-    <p v-if="props.dateLimite !== null">
-      {{
-        new Intl.DateTimeFormat('fr-CA', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric'
-        }).format(new Date(props.dateLimite))
-      }}
-    </p>
+    <p>{{ cardDate }}</p>
   </div>
 
   <!-- Modal carte -->
