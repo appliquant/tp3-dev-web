@@ -7,7 +7,7 @@ import { useTableauStore } from '@/stores/store'
 
 import Tableau from '@/components/Tableau.vue'
 import AddIcon from '@/components/icons/AddIcon.vue'
-import Modal from '@/components/Modal.vue'
+import ModalAjoutTableau from '@/components/ModalAjoutTableau.vue'
 import type { PropsTableau } from '@/props/PropTableau'
 
 const API_URL = import.meta.env.VITE_API_URL
@@ -245,7 +245,7 @@ onMounted(() => {
 
       <!-- Modal ajout tableau -->
       <Teleport to="body">
-        <Modal
+        <ModalAjoutTableau
           :show="showModal"
           @add="addBoard"
           @close=";(showModal = false), fetchUserInfo()"
@@ -267,7 +267,7 @@ onMounted(() => {
               />
             </form>
           </template>
-        </Modal>
+        </ModalAjoutTableau>
       </Teleport>
     </div>
 

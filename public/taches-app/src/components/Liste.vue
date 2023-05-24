@@ -5,8 +5,8 @@ import { useRouter } from 'vue-router'
 import { useTableauStore } from '@/stores/store'
 import { useNotification } from '@kyvg/vue3-notification'
 
+import Carte from '@/components/Carte.vue'
 import RemoveIcon from '@/components/icons/RemoveIcon.vue'
-import Carte from './Carte.vue'
 
 import type { PropsFiltres } from '@/props/PropsFiltres'
 import type { PropsListe } from '@/props/PropsListe'
