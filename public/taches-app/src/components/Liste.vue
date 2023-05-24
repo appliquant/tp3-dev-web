@@ -192,6 +192,9 @@ const handleAddCard = async () => {
     // Fermer l'élément d'ajout de carte
     showAddCardElement.value = false
 
+    // Vider le titre de la carte
+    newCardTitle.value = ''
+
     // Message de succès
     return notification.notify({
       title: "Ajout d'une carte",
@@ -228,15 +231,6 @@ const handleListTitleChanged = (event: any) => {
 const resetListTitle = (event: any) => {
   event.srcElement.innerText = props.titre
 }
-
-/**
- * Gère l'ajout d'une carte
- * @param event
- */
-// const handleAddCard = () => {
-//   // Émettre l'événement
-//   emit('addCard', props._id, newCardTitle.value)
-// }
 
 onMounted(() => {
   // Récupérer les cartes de la liste au chargement du composant
@@ -275,7 +269,7 @@ onMounted(() => {
     </ul>
 
     <!-- Section ajout carte -->
-    <div class="list__button">
+    <div class="list__footer">
       <div v-if="showAddCardElement === false">
         <button class="button--primary" @click="showAddCardElement = !showAddCardElement">
           Ajouter
@@ -314,24 +308,35 @@ h2 {
 .list {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-
   max-height: calc(100vh - var(--header-height) - 10vh);
   padding: 1em;
   background-color: var(--color-gray-light);
   border-radius: 0.4em;
 }
 
+/*
+//////////////////////////////
+// List header
+//////////////////////////////
+*/
+
 .list__header {
+  flex: 1;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  align-items: start;
+  align-items: center;
   flex-wrap: wrap;
   overflow-y: auto;
   max-height: 10em;
   min-height: 3em;
 }
+
+/*
+//////////////////////////////
+// List contentÉlément ajout carte
+//////////////////////////////
+*/
 
 .list__content {
   flex: 1;
@@ -351,15 +356,36 @@ h2 {
   list-style: none;
 }
 
-.list__button > button {
-  width: 100%;
-  /* filter: drop-shadow(0px 0px 10px var(--secondary-color)); */
+/*
+//////////////////////////////
+// List footer
+//////////////////////////////
+*/
+
+.list__footer {
+  flex: 1;
+  padding-top: 1em;
 }
 
+.list__footer > button {
+  width: 100%;
+}
+
+/*
+//////////////////////////////
+// List icon
+//////////////////////////////
+*/
 .list--icon--delete {
   width: 2.2em;
   height: 2.2em;
 }
+
+/*
+//////////////////////////////
+// Élément ajout carte
+//////////////////////////////
+*/
 
 .list .element-add-new-card {
   background-color: var(--color-gray-light);
