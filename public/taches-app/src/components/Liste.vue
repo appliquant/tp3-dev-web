@@ -17,18 +17,17 @@ const router = useRouter()
 const store = useTableauStore()
 const notification = useNotification()
 
-// Étendre les props de la liste
-interface PropsCarteListe extends PropsListe {
-  /**
-   * Filtres des cartes
-   */
-  cardsFilters: PropsFiltres
-}
-
 /**
  * Props de la liste
  */
-const props = defineProps<PropsCarteListe>()
+const props = defineProps<
+  PropsListe & {
+    /**
+     * Filtres des cartes
+     */
+    cardsFilters: PropsFiltres
+  }
+>()
 
 /**
  * Événements émis par la liste
@@ -288,8 +287,9 @@ onMounted(() => {
 
     <!-- Contenu -->
     <ul class="list__content">
-      <li class="list__content container" v-for="card in cards.cards">
+      <li v-for="card in cards.cards">
         <Carte
+          :key="card._id"
           :_id="card._id"
           :titre="card.titre"
           :description="card.description"
@@ -311,6 +311,7 @@ onMounted(() => {
         <form v-on:submit.prevent="handleAddCard" class="element-add-new-card">
           <label>
             <input
+              maxlength="50"
               autofocus="true"
               type="text"
               placeholder="Nom de la carte..."
@@ -377,19 +378,6 @@ h2 {
 
 .list__content::-webkit-scrollbar {
   display: none;
-}
-
-.list__content .container {
-  cursor: pointer;
-  background-color: var(--color-gray-light);
-  border-radius: 0.4em;
-  padding: 1em;
-  margin: 1em auto 1em auto;
-  list-style: none;
-}
-
-.list__content .container:hover {
-  opacity: 0.8;
 }
 
 /*

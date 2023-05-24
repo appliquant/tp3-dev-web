@@ -459,6 +459,7 @@ onMounted(() => {
     <ul class="horizontal-lists-container">
       <li v-for="list in boardData.lists">
         <Liste
+          :key="list._id"
           :_id="list._id"
           :titre="list.titre"
           :tableau="list.tableau"

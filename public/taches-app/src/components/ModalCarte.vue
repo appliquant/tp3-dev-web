@@ -68,9 +68,13 @@ const emit = defineEmits<{
 }
 
 .modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
+  display: grid;
+  grid-template-columns: 7fr 1fr;
+  align-items: start;
+}
+
+.modal-header h2 {
+  word-break: break-all;
 }
 
 .modal-enter-from {
