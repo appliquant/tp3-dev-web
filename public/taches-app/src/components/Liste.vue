@@ -35,13 +35,6 @@ const emit = defineEmits<{
    * @param listId Id de la liste à supprimer
    */
   (e: 'deleteList', listId: string): void
-
-  /**
-   * Émis quand l'utilisateur clique sur le bouton d'ajout de carte
-   * @param listId Id de la liste à modifier
-   * @param cardTitle Titre de la carte à ajouter
-   */
-  (e: 'addCard', listId: string, cardTitle: string): void
 }>()
 
 /**
@@ -144,12 +137,20 @@ const handleAddCard = async () => {
       return redirectToLoginPage()
     }
 
+    // Date (mettre dans un an par défaut)
+    const date = new Date().setFullYear(new Date().getFullYear() + 1)
+
     // Carte à ajouter
     const newCard = {
       titre: newCardTitle.value.trim(),
       description: ' ',
-      dateLimite: new Date().toISOString() // Date en UTC
+      dateLimite: new Date(date).toISOString() // Date en UTC
     }
+
+    // Add 1 year to date
+    newCard.dateLimite = new Date(
+      new Date(newCard.dateLimite).setFullYear(new Date(newCard.dateLimite).getFullYear() + 1)
+    ).toISOString()
 
     const params = {
       method: 'POST',
