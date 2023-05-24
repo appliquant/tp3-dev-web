@@ -5,6 +5,11 @@ import RemoveIcon from '@/components/icons/RemoveIcon.vue'
 import type { PropsListe } from '@/props/PropsListe'
 
 /**
+ * Afficher ou non l'élément d'ajout de carte
+ */
+const showAddCardElement = ref(false)
+
+/**
  * Props de la liste
  */
 const props = defineProps<PropsListe>()
@@ -77,9 +82,26 @@ const resetTitle = (event: any) => {
       </li>
     </ul>
 
-    <!-- Ajout carte -->
+    <!-- Section ajout carte -->
     <div class="list__button">
-      <button class="button--primary">Ajouter</button>
+      <div v-if="showAddCardElement === false">
+        <button class="button--primary" @click="showAddCardElement = !showAddCardElement">
+          Ajouter
+        </button>
+      </div>
+
+      <div v-else>
+        <form v-on:submit.prevent="" class="element-add-new-card">
+          <label>
+            <input autofocus type="text" placeholder="Nom de la carte..." autocomplete="off" />
+          </label>
+
+          <div>
+            <button class="button--primary">Ajouter carte</button>
+            <RemoveIcon class="icon" @click="showAddCardElement = false" />
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 </template>
@@ -136,6 +158,26 @@ h2 {
 }
 
 .list--icon--delete {
+  width: 2.2em;
+  height: 2.2em;
+}
+
+.list .element-add-new-card {
+  background-color: var(--color-gray-light);
+  border-radius: 0.4em;
+  padding: 1em;
+  list-style: none;
+  transition: all 1s ease-in-out;
+}
+
+.list .element-add-new-card div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1em;
+}
+
+.list .element-add-new-card div svg {
   width: 2.2em;
   height: 2.2em;
 }
