@@ -248,7 +248,7 @@ const resetListTitle = (event: any) => {
   event.srcElement.innerText = props.titre
 }
 
-// À chaque changement de filtres, récupérer les cartes de la liste
+// À chaque changement de filtres, récupérer les cartes de la liste à nouveau
 watch(
   () => props.cardsFilters,
   () => {

@@ -27,20 +27,16 @@ const props = defineProps<
 >()
 
 /**
- * Propriétés qui affiche la date limite
+ * Propriété qui affiche la date limite en format locale
  */
 const cardDate = computed(() => {
   if (!props.dateLimite) {
     return
   }
 
-  const date = new Date(props.dateLimite)
-  console.log(props.dateLimite)
-  console.log(date)
-
   return new Intl.DateTimeFormat('fr-CA', {
     year: 'numeric',
-    month: 'long',
+    month: 'numeric',
     day: 'numeric'
   }).format(new Date(props.dateLimite))
 })
@@ -76,6 +72,7 @@ const redirectToLoginPage = (errMessage?: string) => {
  * @param event Événement
  */
 const resetCardTitle = (event: any) => {
+  // Remettre le titre de la carte à sa valeur initiale
   event.srcElement.innerText = props.titre
 
   // Remettre le titre de la carte temporaire à sa valeur initiale
@@ -159,7 +156,6 @@ const handleUpdateCard = async () => {
       type: 'success'
     })
   } catch (err) {
-    console.log(err)
     return notification.notify({
       title: 'Erreur',
       text: 'Une erreur est survenue lors de la modification de la carte',
@@ -184,12 +180,11 @@ const handleUpdateCard = async () => {
         <h2
           @keyup.enter="handleCardTitleChange($event)"
           @keyup.escape="resetCardTitle($event)"
-          @blur="resetCardTitle($event)"
           contenteditable
           spellcheck="false"
           class="content-editable"
         >
-          {{ props.titre }}
+          {{ tempCard.titre }}
         </h2>
         <RemoveIcon class="icon icon--remove" @click="showModal = false" />
       </template>
@@ -197,12 +192,27 @@ const handleUpdateCard = async () => {
       <!-- Body -->
       <template #body>
         <form @submit.prevent="handleUpdateCard">
-          <label for="date"><h3>Date limite</h3></label>
-          <input v-model="tempCard.dateLimite" id="date" type="date" style="width: 100%" />
+          <label for="date">
+            <h3>Date limite</h3>
+          </label>
+
+          <input
+            :value="cardDate"
+            @input="
+              (event) => {
+                // Assigner la nouvelle date à la carte temporaire
+                // @ts-ignore
+                tempCard.dateLimite = new Date(event?.target?.value)
+              }
+            "
+            id="date"
+            type="date"
+          />
 
           <label for="description">
             <h3>Description</h3>
           </label>
+
           <textarea
             v-model="tempCard.description"
             id="description"
