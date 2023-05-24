@@ -94,6 +94,20 @@ exports.getCartes = async (req, res, next) => {
     // Récupérer les données du formulaire
     const { tableauId, listeId } = req.params;
 
+    // Liste des filtres
+    // cardsFilterNone      : cartes sans date limite
+    // cardsFilterTomorrow  : cartes qui ont une date limite demain
+    // cardsFilterLate      : cartes qui ont une date limite dépassée (retard)
+    const { cardsFilterNone, cardsFilterTomorrow, cardsFilterLate } = req.query;
+
+    // Aucun filtre défini (si auncun filtre spécifé)
+    const filtresUndefined =
+      cardsFilterNone === undefined && cardsFilterTomorrow === undefined && cardsFilterLate === undefined;
+
+    // Tous les filtres sont à false (filtre spécifié, mais tous à false)
+    const filtresTousAFalse =
+      cardsFilterNone === "false" && cardsFilterTomorrow === "false" && cardsFilterLate === "false";
+
     // Vérifier si les données sont présentes
     const errChamps = champsManquants({
       tableauId: tableauId,
@@ -126,8 +140,43 @@ exports.getCartes = async (req, res, next) => {
       return res.status(403).json({ message: "Cette liste n'appartient pas au tableau." });
     }
 
-    // Trouver les cartes
-    const cartes = await Carte.find({ liste: listeId });
+    // Objet carte
+    let cartes = [];
+
+    // Aucun filtre défini ou filtres tous à false
+    if (filtresUndefined || filtresTousAFalse) {
+      // Retourner toutes les cartes
+      const cartes = await Carte.find({ liste: listeId });
+      return res.status(200).json(cartes);
+    }
+
+    // Filtre "Aucune" défini
+    if (cardsFilterNone === "true") {
+      // Trouver toutes les cartes sans date limite
+      cartes = await Carte.find({ liste: listeId, dateLimite: undefined });
+    }
+
+    // Filtre "Demain" définicartes
+    if (cardsFilterTomorrow === "true") {
+      // Trouver les cartes qui finissent demain
+      const maint = new Date(); // maintenant
+      const demain = new Date(new Date().setDate(maint.getDate() + 1)); // maintenant + 1 jour
+
+      // Sauvegarder resultats (car multi-choix)
+      cartes.push(await Carte.find({ liste: listeId, dateLimite: { $gte: maint, $lt: demain } }));
+    }
+
+    // Filtre "Retard" défini
+    if (cardsFilterLate === "true") {
+      // Récupérer les cartes qui sont en retard (dateLimite plus petite qu'aujourd'hui)
+      const maint = new Date(); // maintenant
+
+      // Sauvegarder résultats (car multi-choix)
+      cartes.push(await Carte.find({ liste: listeId, dateLimite: { $lt: maint } }));
+    }
+
+    // Retirer les sub-arrays [[carte], [carte]] => [carte, carte]
+    cartes = cartes.flat(1);
 
     // Retourner les cartes
     res.status(200).json(cartes);

@@ -129,7 +129,6 @@ const handleFetchCards = async () => {
       // Parse date (ex : 2021-05-31T04:00:00.000Z -> format Date() de javascript)
       resCard.dateLimite = new Date(resCard.dateLimite)
 
-      // Ajouter la carte à la liste de cartes locales
       return resCard
     })
   } catch (err) {
