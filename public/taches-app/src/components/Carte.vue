@@ -1,8 +1,30 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, reactive } from 'vue'
+import { useRouter } from 'vue-router'
 
-import type { PropsCarte } from '@/props/PropsCarte'
+import { useTableauStore } from '@/stores/store'
+import { useNotification } from '@kyvg/vue3-notification'
+
+import RemoveIcon from '@/components/icons/RemoveIcon.vue'
 import ModalCarte from './ModalCarte.vue'
+import type { PropsCarte } from '@/props/PropsCarte'
+
+const API_URL = import.meta.env.VITE_API_URL
+const router = useRouter()
+const store = useTableauStore()
+const notification = useNotification()
+
+/**
+ * Props de la carte
+ */
+const props = defineProps<
+  PropsCarte & {
+    /**
+     * Id du tableau
+     */
+    boardId: string
+  }
+>()
 
 /**
  * Afficher ou non le modal
@@ -10,9 +32,119 @@ import ModalCarte from './ModalCarte.vue'
 const showModal = ref(false)
 
 /**
- * Props de la carte
+ * Carte temporaire pour sauvegarder les modifications
  */
-const props = defineProps<PropsCarte>()
+const tempCard = reactive<PropsCarte>({
+  ...props
+})
+
+/**
+ * Rediriger vers page de connexion
+ */
+const redirectToLoginPage = (errMessage?: string) => {
+  // Supprimer jwt
+  store.$reset()
+
+  // Redirection vers page de connexion
+  return router.push({
+    name: 'connexion',
+    query: { errMessage: errMessage ? errMessage : 'Connectez-vous pour accéder à cette ressource' }
+  })
+}
+
+/**
+ * Remet le titre de la carte à sa valeur initiale (lors du clic sur "Escape")
+ * @param event Événement
+ */
+const resetCardTitle = (event: any) => {
+  event.srcElement.innerText = props.titre
+
+  // Remettre le titre de la carte temporaire à sa valeur initiale
+  tempCard.titre = props.titre
+}
+
+/**
+ * Change le titre de la carte temporaire
+ * @param event Événement
+ */
+const handleCardTitleChange = (event: any) => {
+  // Assigner le nouveau titre à la carte temporaire
+  tempCard.titre = event?.target?.innerText
+
+  // Retirer focus
+  event?.srcElement?.blur()
+}
+
+/**
+ * Modification d'une carte
+ */
+const handleUpdateCard = async () => {
+  try {
+    // Validations
+    if (tempCard.titre === '') {
+      return notification.notify({
+        title: 'Erreur',
+        text: 'Le titre ne peut pas être vide',
+        type: 'error'
+      })
+    }
+
+    // Trouver jwt
+    const jwt = store.getJwt()
+    if (!jwt) {
+      return redirectToLoginPage()
+    }
+
+    // Paramètres de la requête
+    const params = {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `${jwt}`
+      },
+      body: JSON.stringify({
+        ...tempCard,
+        dateLimite: tempCard.dateLimite === null ? 'null' : tempCard.dateLimite
+      })
+    }
+
+    // Requête
+    const req = await fetch(
+      `${API_URL}/tableaux/${props.boardId}/listes/${props.liste}/cartes/${props._id}`,
+      params
+    )
+    const response = await req.json()
+
+    // Si erreur
+    if (!req.ok) {
+      if (req.status === 401) {
+        return redirectToLoginPage(response.message)
+      }
+
+      return notification.notify({
+        title: 'Erreur lors de la modification de la carte',
+        text: `Une erreur est survenue : ${response.message}`,
+        type: 'error'
+      })
+    }
+
+    // Fermer le modal
+    showModal.value = false
+
+    // Notification succès
+    return notification.notify({
+      title: 'Succès',
+      text: 'La carte a été modifiée avec succès',
+      type: 'success'
+    })
+  } catch (err) {
+    return notification.notify({
+      title: 'Erreur',
+      text: 'Une erreur est survenue lors de la modification de la carte',
+      type: 'error'
+    })
+  }
+}
 </script>
 
 <template>
@@ -32,22 +164,38 @@ const props = defineProps<PropsCarte>()
 
   <!-- Modal carte -->
   <Teleport to="body">
-    <ModalCarte :card="props" :show="showModal" @close="showModal = false">
-      <template #body>
-        <!-- <p class="badge badge--date">
-          {{ props._id }}
-        </p> -->
+    <ModalCarte :card="props" :show="showModal">
+      <!-- Header -->
+      <template #header>
+        <h2
+          @keyup.enter="handleCardTitleChange($event)"
+          @keyup.escape="resetCardTitle($event)"
+          @blur="resetCardTitle($event)"
+          contenteditable
+          spellcheck="false"
+          class="content-editable"
+        >
+          {{ props.titre }}
+        </h2>
+        <RemoveIcon class="icon icon--remove" @click="showModal = false" />
+      </template>
 
-        <form action="">
+      <!-- Body -->
+      <template #body>
+        <form @submit.prevent="handleUpdateCard">
           <label for="date"><h3>Date limite</h3></label>
-          <input id="date" type="date" style="width: 100%" />
+          <input v-model="tempCard.dateLimite" id="date" type="date" style="width: 100%" />
 
           <label for="description">
             <h3>Description</h3>
           </label>
-          <textarea id="description" maxlength="500" placeholder="Description...">{{
-            props.description
-          }}</textarea>
+          <textarea
+            v-model="tempCard.description"
+            id="description"
+            maxlength="500"
+            placeholder="Description..."
+            >{{ props.description }}</textarea
+          >
 
           <button class="button--primary">Modifier</button>
         </form>

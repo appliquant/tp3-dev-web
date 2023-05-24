@@ -295,6 +295,7 @@ onMounted(() => {
           :description="card.description"
           :dateLimite="card.dateLimite"
           :liste="props._id"
+          :boardId="props.tableau"
         />
       </li>
     </ul>

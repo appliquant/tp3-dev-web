@@ -310,7 +310,7 @@ exports.updateCarte = async (req, res, next) => {
     // Modifier la carte
     carte.titre = titre;
     carte.description = description;
-    carte.dateLimite = dateLimite;
+    carte.dateLimite = dateLimite === "null" ? null : dateLimite;
 
     // Sauvegarder la carte
     await carte.save();

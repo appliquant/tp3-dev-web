@@ -1,7 +1,6 @@
 <script setup lang="ts">
 // Source : https://vuejs.org/examples/#modal
 
-import RemoveIcon from '@/components/icons/RemoveIcon.vue'
 import type { PropsCarte } from '@/props/PropsCarte'
 
 const props = defineProps<{
@@ -15,13 +14,6 @@ const props = defineProps<{
    */
   card: PropsCarte
 }>()
-
-const emit = defineEmits<{
-  /**
-   * Événement émis lors de la fermeture du modal
-   */
-  (e: 'close'): void
-}>()
 </script>
 
 <template>
@@ -30,8 +22,7 @@ const emit = defineEmits<{
       <div class="modal-container">
         <!-- header -->
         <div class="modal-header">
-          <h2>{{ props.card.titre }}</h2>
-          <RemoveIcon class="icon icon--remove" @click="emit('close')" />
+          <slot name="header">default body</slot>
         </div>
 
         <!-- Body -->
@@ -71,9 +62,6 @@ const emit = defineEmits<{
   display: grid;
   grid-template-columns: 7fr 1fr;
   align-items: start;
-}
-
-.modal-header h2 {
   word-break: break-all;
 }
 
