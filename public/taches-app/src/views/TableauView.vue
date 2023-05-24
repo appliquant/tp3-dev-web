@@ -7,6 +7,8 @@ import { useNotification } from '@kyvg/vue3-notification'
 
 import Liste from '@/components/Liste.vue'
 import RemoveIconVue from '@/components/icons/RemoveIcon.vue'
+
+import type { PropsFiltres } from '@/props/PropsFiltres'
 import type { PropsTableau } from '@/props/PropTableau'
 import type { PropsListe } from '@/props/PropsListe'
 
@@ -55,6 +57,15 @@ const isLoaded = computed(() => {
 const boardData = reactive({
   board: {} as PropsTableau,
   lists: [] as PropsListe[]
+})
+
+/**
+ * Filtres des cartes
+ */
+const cardsFilters = reactive<PropsFiltres>({
+  none: false,
+  tomorrow: false,
+  late: false
 })
 
 /**
@@ -409,7 +420,13 @@ onMounted(() => {
         <!-- Filtre -->
         <form>
           <div>
-            <input type="checkbox" id="filter-date-none" name="filter-date-none" value="none" />
+            <input
+              type="checkbox"
+              id="filter-date-none"
+              name="filter-date-none"
+              value="none"
+              v-model="cardsFilters.none"
+            />
             <label for="filter-date-none">Aucune</label>
           </div>
 
@@ -419,12 +436,19 @@ onMounted(() => {
               id="filter-date-tomorrow"
               name="filter-date-tomorrow"
               value="tomorrow"
+              v-model="cardsFilters.tomorrow"
             />
             <label for="filter-date-tomorrow">Demain</label>
           </div>
 
           <div>
-            <input type="checkbox" id="filter-date-late" name="filter-date-late" value="late" />
+            <input
+              type="checkbox"
+              id="filter-date-late"
+              name="filter-date-late"
+              value="late"
+              v-model="cardsFilters.late"
+            />
             <label for="filter-date-late">Retard</label>
           </div>
         </form>
@@ -438,6 +462,7 @@ onMounted(() => {
           :_id="list._id"
           :titre="list.titre"
           :tableau="list.tableau"
+          :cards-filters="cardsFilters"
           @update-list-title="(idList, title) => handleUpdateListeTitle(idList, title)"
           @delete-list="(idList) => handleDeleteList(idList)"
         />

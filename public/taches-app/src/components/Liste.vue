@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, ref, onMounted } from 'vue'
+import { reactive, ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { useTableauStore } from '@/stores/store'
@@ -8,6 +8,7 @@ import { useNotification } from '@kyvg/vue3-notification'
 import RemoveIcon from '@/components/icons/RemoveIcon.vue'
 import Carte from './Carte.vue'
 
+import type { PropsFiltres } from '@/props/PropsFiltres'
 import type { PropsListe } from '@/props/PropsListe'
 import type { PropsCarte } from '@/props/PropsCarte'
 
@@ -16,10 +17,18 @@ const router = useRouter()
 const store = useTableauStore()
 const notification = useNotification()
 
+// Étendre les props de la liste
+interface PropsCarteListe extends PropsListe {
+  /**
+   * Filtres des cartes
+   */
+  cardsFilters: PropsFiltres
+}
+
 /**
  * Props de la liste
  */
-const props = defineProps<PropsListe>()
+const props = defineProps<PropsCarteListe>()
 
 /**
  * Événements émis par la liste
@@ -89,9 +98,14 @@ const handleFetchCards = async () => {
       }
     }
 
+    // Filtres à envoyer
+    let filters = `?cardsFilterNone=${props.cardsFilters.none}`
+    filters += `&cardsFilterTomorrow=${props.cardsFilters.tomorrow}`
+    filters += `&cardsFilterLate=${props.cardsFilters.late}`
+
     // Requête
     const req = await fetch(
-      `${API_URL}/tableaux/${props.tableau}/listes/${props._id}/cartes`,
+      `${API_URL}/tableaux/${props.tableau}/listes/${props._id}/cartes${filters}`,
       params
     )
     const response = await req.json()
@@ -111,7 +125,13 @@ const handleFetchCards = async () => {
     }
 
     // Ajouter les cartes à la liste
-    cards.cards = response
+    cards.cards = response.map((resCard: any) => {
+      // Parse date (ex : 2021-05-31T04:00:00.000Z -> format Date() de javascript)
+      resCard.dateLimite = new Date(resCard.dateLimite)
+
+      // Ajouter la carte à la liste de cartes locales
+      return resCard
+    })
   } catch (err) {
     notification.notify({
       title: 'Récupérer les cartes',
@@ -234,6 +254,16 @@ const handleListTitleChanged = (event: any) => {
 const resetListTitle = (event: any) => {
   event.srcElement.innerText = props.titre
 }
+
+// À chaque changement de filtres, récupérer les cartes de la liste
+watch(
+  () => props.cardsFilters,
+  () => {
+    console.log('props.cardsFilters', props.cardsFilters)
+    handleFetchCards()
+  },
+  { deep: true }
+)
 
 onMounted(() => {
   // Récupérer les cartes de la liste au chargement du composant
