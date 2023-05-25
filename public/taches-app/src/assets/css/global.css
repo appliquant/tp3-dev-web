@@ -84,6 +84,15 @@ button.button--primary {
   cursor: pointer;
 }
 
+button.button--danger {
+  color: var(--color-red);
+  border: none;
+  background-color: var(--color-gray-light);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
 button.button--primary:hover {
   opacity: 0.8;
 }
@@ -103,6 +112,11 @@ button.button--primary:hover {
 
 .icon:hover {
   opacity: 0.8;
+}
+
+.icon.icon--small {
+  width: 1.5em;
+  height: 1.5em;
 }
 
 svg:focus {

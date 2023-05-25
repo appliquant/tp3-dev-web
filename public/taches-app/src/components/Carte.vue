@@ -5,14 +5,29 @@ import { useRouter } from 'vue-router'
 import { useTableauStore } from '@/stores/store'
 import { useNotification } from '@kyvg/vue3-notification'
 
+import TrashIcon from '@/components/icons/TrashIcon.vue'
 import RemoveIcon from '@/components/icons/RemoveIcon.vue'
-import ModalCarte from './ModalCarte.vue'
+import ModalCarte from '@/components/ModalCarte.vue'
 import type { PropsCarte } from '@/props/PropsCarte'
 
 const API_URL = import.meta.env.VITE_API_URL
 const router = useRouter()
 const store = useTableauStore()
 const notification = useNotification()
+
+const emit = defineEmits<{
+  /**
+   * Événement lorsqu'une carte est modifiée
+   * Utilisé dans le composant Liste.vue pour rafrachir la liste des cartes
+   */
+  (e: 'card-updated'): void
+
+  /**
+   * Événement lorsqu'une carte est supprimée
+   * Utilisé dans le composant Liste.vue pour rafrachir la liste des cartes
+   */
+  (e: 'card-deleted'): void
+}>()
 
 /**
  * Props de la carte
@@ -27,7 +42,7 @@ const props = defineProps<
 >()
 
 /**
- * Propriété qui affiche la date limite en format locale
+ * Propriété qui affiche la date limite en format local
  */
 const cardDate = computed(() => {
   if (!props.dateLimite) {
@@ -149,6 +164,9 @@ const handleUpdateCard = async () => {
     // Fermer le modal
     showModal.value = false
 
+    // Émettre l'événement
+    emit('card-updated')
+
     // Notification succès
     return notification.notify({
       title: 'Succès',
@@ -163,13 +181,82 @@ const handleUpdateCard = async () => {
     })
   }
 }
+
+/**
+ * Suppression d'une carte
+ */
+const handleDeleteCard = async () => {
+  try {
+    // Confirmation
+    const conf = confirm('Êtes-vous sûr de vouloir supprimer cette carte ?')
+    if (!conf) {
+      return
+    }
+
+    // Trouver jwt
+    const jwt = store.getJwt()
+    if (!jwt) {
+      return redirectToLoginPage()
+    }
+
+    // Paramètres de la requête
+    const params = {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `${jwt}`
+      }
+    }
+
+    // Requête
+    const req = await fetch(
+      `${API_URL}/tableaux/${props.boardId}/listes/${props.liste}/cartes/${props._id}`,
+      params
+    )
+    const response = await req.json()
+
+    // Si erreur
+    if (!req.ok) {
+      if (req.status === 401) {
+        return redirectToLoginPage(response.message)
+      }
+
+      return notification.notify({
+        title: 'Erreur lors de la suppression de la carte',
+        text: `Une erreur est survenue : ${response.message}`,
+        type: 'error'
+      })
+    }
+
+    // Fermer le modal
+    showModal.value = false
+
+    // Émettre un événement que la carte a été supprimée
+    emit('card-deleted')
+
+    // Notification succès
+    return notification.notify({
+      title: 'Succès',
+      text: 'La carte a été supprimée avec succès',
+      type: 'success'
+    })
+  } catch (err) {
+    return notification.notify({
+      title: 'Erreur',
+      text: 'Une erreur est survenue lors de la suppression de la carte',
+      type: 'error'
+    })
+  }
+}
 </script>
 
 <template>
   <!-- Contenu -->
   <div class="container" @click="showModal = true">
-    <p>{{ props.titre }}</p>
-    <p>{{ cardDate }}</p>
+    <div>
+      <p>{{ props.titre }}</p>
+      <p>{{ cardDate }}</p>
+    </div>
   </div>
 
   <!-- Modal carte -->
@@ -221,7 +308,10 @@ const handleUpdateCard = async () => {
             >{{ props.description }}</textarea
           >
 
-          <button class="button--primary">Modifier</button>
+          <div class="form-button-section">
+            <button class="button--danger" @click.prevent="handleDeleteCard">Supprimer</button>
+            <button class="button--primary">Modifier</button>
+          </div>
         </form>
       </template>
     </ModalCarte>
@@ -230,6 +320,9 @@ const handleUpdateCard = async () => {
 
 <style scoped>
 .container {
+  display: flex;
+  justify-content: space-between;
+
   cursor: pointer;
   background-color: var(--color-gray-light);
   border-radius: 0.4em;
@@ -240,6 +333,13 @@ const handleUpdateCard = async () => {
 
 .container:hover {
   opacity: 0.8;
+}
+
+.form-button-section {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 1em;
 }
 
 .badge {

@@ -296,6 +296,8 @@ onMounted(() => {
           :dateLimite="card.dateLimite"
           :liste="props._id"
           :boardId="props.tableau"
+          @card-updated="handleFetchCards"
+          @card-deleted="handleFetchCards"
         />
       </li>
     </ul>
