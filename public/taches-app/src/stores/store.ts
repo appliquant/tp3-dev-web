@@ -5,22 +5,11 @@ const MAIN_STORE_KEY = 'main'
 const JWT_LOCAL_STORAGE_KEY = 'jwt'
 
 export const useTableauStore = defineStore(MAIN_STORE_KEY, () => {
-  ///////////////////////////////////////////////////
-  // Getters
-  /////////////////////////////////////////////////
-
   /**
    * Retourne le JWT
    * @returns JWT
    */
-  // const getJwt = computed(() => {
-  //   return localStorage.getItem(JWT_LOCAL_STORAGE_KEY)
-  // })
   const getJwt = () => localStorage.getItem(JWT_LOCAL_STORAGE_KEY)
-
-  /////////////////////////////////////////////////
-  // Actions
-  /////////////////////////////////////////////////
 
   /**
    * Définit le JWT dans le local storageconst getJwt = computed(() => {

@@ -93,13 +93,19 @@ button.button--danger {
   cursor: pointer;
 }
 
-button.button--primary:hover {
+button:hover {
   opacity: 0.8;
+}
+
+a.button--link {
+  color: var(--secondary-color);
+  text-decoration: none;
+  cursor: pointer;
 }
 
 /*
   ////////////////////////////////////
-  // Icon
+  // Icones
   ////////////////////////////////////
 */
 

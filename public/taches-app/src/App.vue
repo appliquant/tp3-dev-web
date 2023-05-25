@@ -1,17 +1,42 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref } from 'vue'
 import { RouterLink, RouterView } from 'vue-router'
-import './assets/css/global.css'
+import { useRouter } from 'vue-router'
 
 import { useTableauStore } from './stores/store'
+
+import './assets/css/global.css'
+
+const router = useRouter()
+const store = useTableauStore()
+
+router.beforeEach((to, from) => {
+  // Vérifie si l'utilisateur est connecté
+  isLoggedIn.value = store.getJwt() !== null
+})
 
 /**
  * Vérifie si l'utilisateur est connecté
  * @returns True si l'utilisateur est connecté, false sinon
  */
-const isLoggedIn = computed(() => {
-  return useTableauStore().getJwt() !== null
-})
+const isLoggedIn = ref(false)
+
+/**
+ * Déconnecte l'utilisateur
+ */
+const logout = () => {
+  // Supprime le JWT du store
+  store.$reset()
+
+  // Changer la valeur de isLoggedIn
+  isLoggedIn.value = false
+
+  // Redirige vers la page de connexion
+  return router.push({
+    name: 'connexion',
+    query: { successMessage: 'Vous avez été déconnecté avec succès.' }
+  })
+}
 </script>
 
 <template>
@@ -23,7 +48,7 @@ const isLoggedIn = computed(() => {
     </nav>
     <nav v-else="isLoggedIn">
       <RouterLink to="/tableaux" class="logo">Tableaux</RouterLink>
-      <a>Connecté</a>
+      <a @click="logout" class="button--link">Déconnecter</a>
     </nav>
   </header>
 
