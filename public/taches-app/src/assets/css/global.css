@@ -1,6 +1,7 @@
 @import url(cssreset.css);
 @import url(header.css);
 @import url(form.css);
+@import url(badge.css);
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;800;900&display=swap');
 
@@ -16,6 +17,7 @@
   --tertiary-color: #f5f5f5;
   --color-gray: #cccccc91;
   --color-red: #ff0000;
+  --color-yellow: #ffff00;
   --color-gray-light: #cccccc33;
 
   --header-height: 5rem;

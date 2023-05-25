@@ -5,7 +5,6 @@ import { useRouter } from 'vue-router'
 import { useTableauStore } from '@/stores/store'
 import { useNotification } from '@kyvg/vue3-notification'
 
-import TrashIcon from '@/components/icons/TrashIcon.vue'
 import RemoveIcon from '@/components/icons/RemoveIcon.vue'
 import ModalCarte from '@/components/ModalCarte.vue'
 import type { PropsCarte } from '@/props/PropsCarte'
@@ -42,21 +41,6 @@ const props = defineProps<
 >()
 
 /**
- * Propriété qui affiche la date limite en format local
- */
-const cardDate = computed(() => {
-  if (!props.dateLimite) {
-    return
-  }
-
-  return new Intl.DateTimeFormat('fr-CA', {
-    year: 'numeric',
-    month: 'numeric',
-    day: 'numeric'
-  }).format(new Date(props.dateLimite))
-})
-
-/**
  * Afficher ou non le modal
  */
 const showModal = ref(false)
@@ -66,6 +50,76 @@ const showModal = ref(false)
  */
 const tempCard = reactive<PropsCarte>({
   ...props
+})
+
+/**
+ * Retourne date formaté pour le champ date de l'input.
+ * yyyy-mm-ddThh:mm
+ */
+const date = computed({
+  // @ts-ignore
+  get() {
+    if (!tempCard.dateLimite) {
+      return
+    }
+
+    const year = tempCard.dateLimite.getFullYear().toString()
+    let month = (tempCard.dateLimite.getMonth() + 1).toString()
+    if (month.length < 2) {
+      month = '0' + month
+    }
+
+    let day = tempCard.dateLimite.getDate().toString()
+    if (day.length < 2) {
+      day = '0' + day
+    }
+
+    let hours = tempCard.dateLimite.getHours().toString()
+    if (hours.length < 2) {
+      hours = '0' + hours
+    }
+
+    let minutes = tempCard.dateLimite.getMinutes().toString()
+    if (minutes.length < 2) {
+      minutes = '0' + minutes
+    }
+
+    return `${year}-${month}-${day}T${hours}:${minutes}`
+  },
+  set(newDate: Date) {
+    const date = new Date(newDate)
+    tempCard.dateLimite = date
+  }
+})
+
+/**
+ * Retourne la classe que doit avoir la date de la carte
+ * Rouge : date dépassée
+ * Jaune : date dans moins de 24h
+ * Verte : date dans plus de 24h
+ */
+const dateStyle = computed(() => {
+  if (!props.dateLimite) {
+    return
+  }
+
+  const dateLimite = props.dateLimite
+  const today = new Date()
+
+  // Différence entre les dates en heures. 1000ms * 60 = 1s * 60 = 1h
+  const diff = Math.abs((dateLimite.getTime() - today.getTime()) / (1000 * 60 * 60))
+
+  // Si date dépassée
+  if (dateLimite < today) {
+    return 'badge--red'
+  }
+
+  // Si c'est dans moins de 24 heures
+  if (diff < 24) {
+    return 'badge--yellow'
+  }
+
+  return 'badge--green'
 })
 
 /**
@@ -255,7 +309,7 @@ const handleDeleteCard = async () => {
   <div class="container" @click="showModal = true">
     <div>
       <p>{{ props.titre }}</p>
-      <p>{{ cardDate }}</p>
+      <p :class="`badge ${dateStyle}`">{{ props.dateLimite?.toLocaleDateString() }}</p>
     </div>
   </div>
 
@@ -278,23 +332,14 @@ const handleDeleteCard = async () => {
 
       <!-- Body -->
       <template #body>
+        {{ tempCard.dateLimite }}
+
         <form @submit.prevent="handleUpdateCard">
           <label for="date">
             <h3>Date limite</h3>
           </label>
 
-          <input
-            :value="cardDate"
-            @input="
-              (event) => {
-                // Assigner la nouvelle date à la carte temporaire
-                // @ts-ignore
-                tempCard.dateLimite = new Date(event?.target?.value)
-              }
-            "
-            id="date"
-            type="date"
-          />
+          <input v-model="date" id="date" type="datetime-local" />
 
           <label for="description">
             <h3>Description</h3>
@@ -340,22 +385,5 @@ const handleDeleteCard = async () => {
   justify-content: space-between;
   width: 100%;
   margin-top: 1em;
-}
-
-.badge {
-  display: inline-block;
-  margin-bottom: 1em;
-  padding: 0.15em 0.3em 0.15em 0.3em;
-  border-radius: 0.25rem;
-  font-size: 0.85em;
-  font-weight: 700;
-  line-height: 1;
-  text-align: center;
-  white-space: nowrap;
-}
-
-.badge--date {
-  background-color: var(--secondary-color);
-  color: var(--primary-color);
 }
 </style>
