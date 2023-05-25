@@ -54,6 +54,8 @@ const cards = reactive({
   cards: [] as PropsCarte[]
 })
 
+const cardsRef = ref(cards.cards)
+
 /**
  * Référence vers le titre de la carte
  */
@@ -63,6 +65,48 @@ const newCardTitle = ref('')
  * Afficher ou non l'élément d'ajout de carte
  */
 const showAddCardElement = ref(false)
+
+/**
+ * Événement lorsqu'une carte est déplacée (drag)
+ * @param event Événement
+ * @param card Carte déplacée
+ */
+const onDragStart = (event: DragEvent, card: PropsCarte) => {
+  console.log('dragging...')
+
+  event.dataTransfer!.effectAllowed = 'move'
+  event.dataTransfer!.dropEffect = 'move'
+  event.dataTransfer?.setData('text/plain', JSON.stringify(card))
+}
+
+/**
+ * Événement lorsqu'une carte est déposée (drop)
+ * @param event Événement
+ * @param targetListId Liste cible
+ */
+const onDrop = (event: DragEvent, targetListId: string) => {
+  const item: PropsCarte = JSON.parse(event.dataTransfer!.getData('text/plain'))
+
+  // Ne pas drag sur sois même
+  if (item.liste === targetListId) {
+    return
+  }
+
+  // Supprimer la carte de sa liste d'origine
+  store.handleDeleteCardNoConfirmation(props.tableau, item.liste, item._id)
+
+  // Créer la carte dans la liste cible
+  const updatedCard: PropsCarte = {
+    ...item,
+    liste: targetListId,
+    dateLimite: item.dateLimite ? new Date(item.dateLimite) : null
+  }
+
+  store.handleAddCard(updatedCard, props.tableau, targetListId)
+
+  // Rafraichir la page
+  router.go(0)
+}
 
 /**
  * Rediriger vers page de connexion
@@ -286,20 +330,25 @@ onMounted(() => {
     </div>
 
     <!-- Contenu -->
-    <ul class="list__content">
-      <li v-for="card in cards.cards">
-        <Carte
-          :key="card._id"
-          :_id="card._id"
-          :titre="card.titre"
-          :description="card.description"
-          :dateLimite="card.dateLimite"
-          :liste="props._id"
-          :boardId="props.tableau"
-          @card-updated="handleFetchCards"
-          @card-deleted="handleFetchCards"
-        />
-      </li>
+    <ul
+      class="list__content drop-zone"
+      @drop="onDrop($event, props._id)"
+      @dragenter.prevent
+      @dragover.prevent
+    >
+      <Carte
+        v-for="card in cards.cards"
+        :key="card._id"
+        :_id="card._id"
+        :titre="card.titre"
+        :description="card.description"
+        :dateLimite="card.dateLimite"
+        :liste="props._id"
+        :boardId="props.tableau"
+        @drag-start="(event, card) => onDragStart(event, card)"
+        @card-updated="handleFetchCards"
+        @card-deleted="handleFetchCards"
+      />
     </ul>
 
     <!-- Section ajout carte -->
@@ -360,9 +409,7 @@ h2 {
   display: grid;
   grid-template-columns: 1fr 5fr;
   align-items: start;
-  /* overflow-y: auto; */
   max-height: 10em;
-  /* min-height: 3em; */
 }
 
 .list__header::-webkit-scrollbar {
@@ -377,6 +424,7 @@ h2 {
 .list__content {
   overflow-y: auto;
   padding: 0;
+  min-height: 2em;
 }
 
 .list__content::-webkit-scrollbar {

@@ -16,6 +16,11 @@ const notification = useNotification()
 
 const emit = defineEmits<{
   /**
+   * Événement lorsqu'une carte est déplacée (drag)
+   */
+  (e: 'drag-start', event: DragEvent, card: PropsCarte): void
+
+  /**
    * Événement lorsqu'une carte est modifiée
    * Utilisé dans le composant Liste.vue pour rafrachir la liste des cartes
    */
@@ -306,12 +311,19 @@ const handleDeleteCard = async () => {
 
 <template>
   <!-- Contenu -->
-  <div class="container" @click="showModal = true">
+  <li
+    class="container"
+    draggable="true"
+    @dragstart="(event) => emit('drag-start', event, props)"
+    @click="showModal = true"
+  >
     <div>
       <p>{{ props.titre }}</p>
-      <p :class="`badge ${dateStyle}`">{{ props.dateLimite?.toLocaleDateString() }}</p>
+      <p v-if="props.dateLimite" :class="`badge ${dateStyle}`">
+        {{ props.dateLimite?.toLocaleDateString() }}
+      </p>
     </div>
-  </div>
+  </li>
 
   <!-- Modal carte -->
   <Teleport to="body">
@@ -332,8 +344,6 @@ const handleDeleteCard = async () => {
 
       <!-- Body -->
       <template #body>
-        {{ tempCard.dateLimite }}
-
         <form @submit.prevent="handleUpdateCard">
           <label for="date">
             <h3>Date limite</h3>
