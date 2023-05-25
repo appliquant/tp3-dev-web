@@ -55,8 +55,8 @@ exports.createTableau = async (req, res, next) => {
 
 exports.getTableaux = async (req, res, next) => {
   try {
-    // Récupérer les tableaux de l'utilisateur
-    const tableaux = await Tableau.find({ proprietaire: req.utilisateurId });
+    // Récupérer les tableaux de l'utilisateur du plus récent au plus ancien
+    const tableaux = await Tableau.find({ proprietaire: req.utilisateurId }).sort({ createdAt: -1 });
 
     // Retourner les tableaux
     res.status(200).json(tableaux);
