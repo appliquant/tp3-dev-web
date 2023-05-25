@@ -209,17 +209,17 @@ exports.getCartes = async (req, res, next) => {
           {
             self: {
               method: "GET",
-              href: `${hostUrl}/tableaux/${tableauId}/listes/${listeId}/cartes/${carteId}`,
+              href: `${hostUrl}/tableaux/${tableauId}/listes/${listeId}/cartes/${carte._id}`,
             },
 
             update: {
               method: "PUT",
-              href: `${hostUrl}/tableaux/${tableauId}/listes/${listeId}/cartes/${carteId}`,
+              href: `${hostUrl}/tableaux/${tableauId}/listes/${listeId}/cartes/${carte._id}`,
             },
 
             delete: {
               method: "DELETE",
-              href: `${hostUrl}/tableaux/${tableauId}/listes/${listeId}/cartes/${carteId}`,
+              href: `${hostUrl}/tableaux/${tableauId}/listes/${listeId}/cartes/${carte._id}`,
             },
           },
         ],
