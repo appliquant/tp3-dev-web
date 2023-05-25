@@ -75,7 +75,7 @@ export const useTableauStore = defineStore(MAIN_STORE_KEY, () => {
    * @param boardId Id du tableau
    * @param listId Id de la liste
    **/
-  const handleAddCard = async (card: PropsCarte, boardId: string, listId: string) => {
+  const handleAddCardDragDrop = async (card: PropsCarte, boardId: string, listId: string) => {
     try {
       // Validations
       if (card.titre.trim().length < 1) {
@@ -90,9 +90,8 @@ export const useTableauStore = defineStore(MAIN_STORE_KEY, () => {
 
       // Carte à ajouter
       const newCard = {
-        titre: card.titre.trim(),
-        description: ' ',
-        dateLimite: 'null'
+        ...card,
+        dateLimite: card.dateLimite ? card.dateLimite : 'null'
       }
 
       const params = {
@@ -136,5 +135,5 @@ export const useTableauStore = defineStore(MAIN_STORE_KEY, () => {
     localStorage.removeItem(JWT_LOCAL_STORAGE_KEY)
   }
 
-  return { getJwt, setJwt, $reset, handleDeleteCardNoConfirmation, handleAddCard }
+  return { getJwt, setJwt, $reset, handleDeleteCardNoConfirmation, handleAddCardDragDrop }
 })

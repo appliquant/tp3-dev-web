@@ -102,7 +102,7 @@ const onDrop = (event: DragEvent, targetListId: string) => {
     dateLimite: item.dateLimite ? new Date(item.dateLimite) : null
   }
 
-  store.handleAddCard(updatedCard, props.tableau, targetListId)
+  store.handleAddCardDragDrop(updatedCard, props.tableau, targetListId)
 
   // Rafraichir la page
   router.go(0)
