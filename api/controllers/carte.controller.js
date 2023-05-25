@@ -143,11 +143,34 @@ exports.getCartes = async (req, res, next) => {
     // Objet carte
     let cartes = [];
 
+    // Host URL
+    const hostUrl = `${req.protocol}://${req.get("host")}`;
+
     // Aucun filtre défini ou filtres tous à false
     if (filtresUndefined || filtresTousAFalse) {
       // Retourner toutes les cartes
       const cartes = await Carte.find({ liste: listeId });
-      return res.status(200).json(cartes);
+      const _links = cartes.map((carte) => {
+        return {
+          ...carte._doc,
+          _links: [
+            {
+              method: "GET",
+              href: `${hostUrl}/tableaux/${tableauId}/listes/${listeId}/cartes`,
+            },
+            {
+              method: "PUT",
+              href: `${hostUrl}/tableaux/${tableauId}/listes/${listeId}/cartes/${carte._id}`,
+            },
+            {
+              method: "DELETE",
+              href: `${hostUrl}/tableaux/${tableauId}/listes/${listeId}/cartes/${carte._id}`,
+            },
+          ],
+        };
+      });
+
+      return res.status(200).json(_links);
     }
 
     // Filtre "Aucune" défini
@@ -178,8 +201,33 @@ exports.getCartes = async (req, res, next) => {
     // Retirer les sub-arrays [[carte], [carte]] => [carte, carte]
     cartes = cartes.flat(1);
 
+    // HATEOAS
+    const _linksFiltres = cartes.map((carte) => {
+      return {
+        ...carte._doc,
+        _links: [
+          {
+            self: {
+              method: "GET",
+              href: `${hostUrl}/tableaux/${tableauId}/listes/${listeId}/cartes/${carteId}`,
+            },
+
+            update: {
+              method: "PUT",
+              href: `${hostUrl}/tableaux/${tableauId}/listes/${listeId}/cartes/${carteId}`,
+            },
+
+            delete: {
+              method: "DELETE",
+              href: `${hostUrl}/tableaux/${tableauId}/listes/${listeId}/cartes/${carteId}`,
+            },
+          },
+        ],
+      };
+    });
+
     // Retourner les cartes
-    res.status(200).json(cartes);
+    res.status(200).json(_linksFiltres);
   } catch (err) {
     console.error(genererMessageErreur(__filename, err));
     next(err);
@@ -235,8 +283,29 @@ exports.getCarte = async (req, res, next) => {
       return res.status(403).json({ message: "Cette carte n'appartient pas à cette liste." });
     }
 
+    // HATEOAS
+    const hostUrl = `${req.protocol}://${req.get("host")}`;
+    const _links = [
+      {
+        self: {
+          method: "GET",
+          href: `${hostUrl}/tableaux/${tableauId}/listes/${listeId}/cartes/${carteId}`,
+        },
+
+        update: {
+          method: "PUT",
+          href: `${hostUrl}/tableaux/${tableauId}/listes/${listeId}/cartes/${carteId}`,
+        },
+
+        delete: {
+          method: "DELETE",
+          href: `${hostUrl}/tableaux/${tableauId}/listes/${listeId}/cartes/${carteId}`,
+        },
+      },
+    ];
+
     // Retourner la carte
-    res.status(200).json(carte);
+    res.status(200).json({ ...carte._doc, _links: _links });
   } catch (err) {
     console.error(genererMessageErreur(__filename, err));
     next(err);
@@ -315,8 +384,29 @@ exports.updateCarte = async (req, res, next) => {
     // Sauvegarder la carte
     await carte.save();
 
+    // HATEOAS
+    const hostUrl = `${req.protocol}://${req.get("host")}`;
+    const _links = [
+      {
+        self: {
+          method: "GET",
+          href: `${hostUrl}/tableaux/${tableauId}/listes/${listeId}/cartes/${carte._id}`,
+        },
+
+        update: {
+          method: "PUT",
+          href: `${hostUrl}/tableaux/${tableauId}/listes/${listeId}/cartes/${carte._id}`,
+        },
+
+        delete: {
+          method: "DELETE",
+          href: `${hostUrl}/tableaux/${tableauId}/listes/${listeId}/cartes/${carte._id}`,
+        },
+      },
+    ];
+
     // Retourner la carte
-    res.status(201).json(carte);
+    res.status(201).json({ ...carte._doc, _links: _links });
   } catch (err) {
     console.error(genererMessageErreur(__filename, err));
     next(err);
