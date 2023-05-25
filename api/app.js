@@ -34,6 +34,7 @@ const tableauRoutes = require("./routes/tableau.route");
 const listeRoutes = require("./routes/liste.route");
 const carteRoutes = require("./routes/carte.route");
 const utilisateurRoutes = require("./routes/utilisateur");
+const dbRoutes = require("./routes/db.route");
 
 // Utilisation des routes en tant que middleware
 app.use(authRoutes);
@@ -41,6 +42,7 @@ app.use(tableauRoutes);
 app.use(listeRoutes);
 app.use(carteRoutes);
 app.use(utilisateurRoutes);
+app.use(dbRoutes);
 
 // Gestion des erreurs
 // "Attrappe" les erreurs envoyé par "throw"
