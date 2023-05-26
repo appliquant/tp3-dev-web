@@ -1,10 +1,18 @@
 "use strict";
 
+require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
-const app = express();
+const swaggerUi = require("swagger-ui-express");
+const fs = require("fs");
+const YAML = require("yaml");
 
 const genererMessageErreur = require("./autre/generer-message-erreur");
+
+const swaggerDocumentYAML = fs.readFileSync("./swagger.yaml", "utf8");
+const swaggerDocument = YAML.parse(swaggerDocumentYAML);
+
+const app = express();
 
 // parse application/json
 app.use(express.json());
@@ -43,6 +51,7 @@ app.use(listeRoutes);
 app.use(carteRoutes);
 app.use(utilisateurRoutes);
 app.use(dbRoutes);
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Gestion des erreurs
 // "Attrappe" les erreurs envoyé par "throw"

@@ -1,0 +1,577 @@
+openapi: 3.0.0
+servers:
+  - description: Lien de l'API
+    url: https://xxx.render.com
+
+info:
+  version: 1.0.0-oas3.1
+  title: Api
+  description: Routes de l'api
+
+tags:
+  - name: Tableaux
+    description: Routes des tableaux
+  - name: Listes
+    description: Routes des listes
+  - name: Cartes
+    description: Routes des cartes
+
+paths:
+  # Tableaux
+  /tableaux:
+    post:
+      tags:
+        - Tableaux
+      summary: Créer un tableau
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TableauItem"
+      responses:
+        "201":
+          description: "Tableau crée"
+    get:
+      tags:
+        - Tableaux
+      summary: Récupérer tous les tableaux
+      responses:
+        "200":
+          description: Tableaux récupérés en ordre de dernier crée
+          content:
+            application/json: {}
+  /tableaux/{tableauId}:
+    get:
+      tags:
+        - Tableaux
+      summary: Récupérer un tableau
+      parameters:
+        - name: tableauId
+          in: path
+          description: "Identifiant du tableau"
+          schema:
+            type: string
+          required: true
+      responses:
+        "200":
+          description: Tableaux récupéré
+          content:
+            application/json: {}
+        "400":
+          description: Champ manquant, erreur de validation
+          content:
+            application/json: {}
+        "403":
+          description: Utilisateur non propriétaire du tableau
+          content:
+            application/json: {}
+        "404":
+          description: Utilisateur non trouvé
+          content:
+            application/json: {}
+    put:
+      tags:
+        - Tableaux
+      summary: Modifier un tableau
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TableauItem"
+      parameters:
+        - name: tableauId
+          in: path
+          description: "Identifiant du tableau"
+          schema:
+            type: string
+          required: true
+      responses:
+        "201":
+          description: Tableaux modifé
+          content:
+            application/json: {}
+        "400":
+          description: Champ manquant, erreur de validation
+          content:
+            application/json: {}
+        "403":
+          description: Utilisateur non propriétaire du tableau
+          content:
+            application/json: {}
+        "404":
+          description: Utilisateur non trouvé
+          content:
+            application/json: {}
+    delete:
+      tags:
+        - Tableaux
+      summary: Supprimer un tableau
+      parameters:
+        - name: tableauId
+          in: path
+          description: "Identifiant du tableau"
+          schema:
+            type: string
+          required: true
+      responses:
+        "200":
+          description: Tableaux supprimé
+          content:
+            application/json: {}
+        "400":
+          description: Champ manquant, erreur de validation
+          content:
+            application/json: {}
+        "403":
+          description: Utilisateur non propriétaire du tableau
+          content:
+            application/json: {}
+        "404":
+          description: Utilisateur non trouvé
+          content:
+            application/json: {}
+
+  # Listes
+  /tableaux/{tableauId}/listes:
+    post:
+      tags:
+        - Listes
+      summary: Créer une liste
+      parameters:
+        - in: path
+          name: tableauId
+          description: "Identifiant du tableau"
+          schema:
+            type: string
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ListeItem"
+      responses:
+        "201":
+          description: "Liste créée"
+          content:
+            application/json: {}
+        "400":
+          description: "Champ manquant, erreur de validation"
+          content:
+            application/json: {}
+        "403":
+          description: "Non propriétaire ce tableau"
+          content:
+            application/json: {}
+        "404":
+          description: "Tableau non trouvé"
+          content:
+            application/json: {}
+    get:
+      tags:
+        - Listes
+      summary: "Récupérer les liste"
+      parameters:
+        - in: path
+          name: tableauId
+          description: "Identifiant du tableau"
+          schema:
+            type: string
+          required: true
+      responses:
+        "201":
+          description: "Liste créée"
+          content:
+            application/json: {}
+        "400":
+          description: "Champ manquant, erreur de validation"
+          content:
+            application/json: {}
+        "403":
+          description: "Non propriétaire ce tableau"
+          content:
+            application/json: {}
+        "404":
+          description: "Tableau non trouvé"
+          content:
+            application/json: {}
+  /tableaux/{tableauId}/listes/{listeId}:
+    get:
+      tags:
+        - Listes
+      summary: Récupérer une liste
+      parameters:
+        - name: tableauId
+          in: path
+          description: "Identifiant du tableau"
+          schema:
+            type: string
+          required: true
+        - name: listeId
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        "200":
+          description: "Liste récupérée"
+          content:
+            application/json: {}
+        "400":
+          description: "Champ manquant, erreur de validation"
+          content:
+            application/json: {}
+        "403":
+          description: "Utilisateur non propriétaire du tableau"
+          content:
+            application/json: {}
+        "404":
+          description: "Tableau non trouvé,liste non trouvé"
+          content:
+            application/json: {}
+    put:
+      tags:
+        - Listes
+      summary: Modifier une liste
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TableauItem"
+      parameters:
+        - name: tableauId
+          in: path
+          description: "Identifiant du tableau"
+          schema:
+            type: string
+          required: true
+        - name: listeId
+          in: path
+          description: "Identifiant de la liste"
+          schema:
+            type: string
+          required: true
+      responses:
+        "201":
+          description: "Liste modifiée"
+          content:
+            application/json: {}
+        "400":
+          description: "Champ manquant, erreur de validation"
+          content:
+            application/json: {}
+        "403":
+          description: "Utilisateur non propriétaire du tableau, Utilisateur non propriétaire du tableau"
+          content:
+            application/json: {}
+        "404":
+          description: "Tableau non trouvé, liste non trouvée"
+          content:
+            application/json: {}
+    delete:
+      tags:
+        - Listes
+      summary: Supprimer une liste
+      parameters:
+        - name: tableauId
+          in: path
+          description: "Identifiant du tableau"
+          schema:
+            type: string
+          required: true
+        - name: listeId
+          in: path
+          description: "Identifiant de la carte"
+          schema:
+            type: string
+          required: true
+      responses:
+        "200":
+          description: "Liste supprimée"
+          content:
+            application/json: {}
+        "400":
+          description: "Champ manquant, erreur de validation"
+          content:
+            application/json: {}
+        "403":
+          description: "Utilisateur non propriétaire du tableau, Utilisateur non propriétaire du tableau"
+          content:
+            application/json: {}
+        "404":
+          description: "Tableau non trouvé, liste non trouvée"
+          content:
+            application/json: {}
+
+  # Cartes
+  /tableaux/{tableauId}/listes/{listeId}/cartes:
+    post:
+      tags:
+        - Cartes
+      summary: Créer une carte
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CarteItem"
+      parameters:
+        - name: tableauId
+          in: path
+          description: "Identifiant du tableau"
+          schema:
+            type: string
+          required: true
+        - name: listeId
+          description: "Identifiant de la liste"
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        "201":
+          description: "Carte créée"
+          content:
+            application/json: {}
+        "400":
+          description: "Champ manquants, erreur de validation"
+          content:
+            application/json: {}
+        "403":
+          description: "Utilisateur non propriétaire du tableau, Utilisateur non propriétaire de la carte"
+          content:
+            application/json: {}
+        "404":
+          description: "Tableau non trouvé, liste non trouvée"
+          content:
+            application/json: {}
+    get:
+      tags:
+        - Cartes
+      summary: "Récupérer les cartes"
+      parameters:
+        - name: tableauId
+          in: path
+          description: "Identifiant du tableau"
+          schema:
+            type: string
+          required: true
+        - name: listeId
+          description: "Identifiant du tableau"
+          in: path
+          schema:
+            type: string
+          required: true
+        - name: cardsFilterNone
+          in: query
+          schema:
+            type: boolean
+          description: "Affiche les cartes sans date limite"
+        - name: cardsFilterTomorrow
+          in: query
+          schema:
+            type: boolean
+          description: "Affiche les cartes à échéance demain"
+        - name: cardsFilterLate
+          in: query
+          schema:
+            type: boolean
+          description: "Affiche les cartes en retard"
+      responses:
+        "201":
+          description: "Carte créée"
+          content:
+            application/json: {}
+        "400":
+          description: "Champ manquants, erreur de validation"
+          content:
+            application/json: {}
+        "403":
+          description: "Utilisateur non propriétaire du tableau, Utilisateur non propriétaire de la carte"
+          content:
+            application/json: {}
+        "404":
+          description: "Tableau non trouvé, liste non trouvée"
+          content:
+            application/json: {}
+  /tableaux/{tableauId}/listes/{listeId}/cartes/{carteId}:
+    get:
+      tags:
+        - Cartes
+      summary: "Récupérer une carte"
+      parameters:
+        - name: tableauId
+          in: path
+          description: "Identifiant du tableau"
+          schema:
+            type: string
+          required: true
+        - name: listeId
+          in: path
+          description: "Identifiant de la liste"
+          schema:
+            type: string
+          required: true
+        - name: carteId
+          in: path
+          description: "Identifiant de la carte"
+          schema:
+            type: string
+          required: true
+      responses:
+        "200":
+          description: "Carte récupérée"
+          content:
+            application/json: {}
+        "400":
+          description: "Champ manquant, erreur de validation"
+          content:
+            application/json: {}
+        "403":
+          description: >-
+            Utilisateur non propriétaire du tableau.
+            Liste n'apartient pas au tableau.
+            Carte n'aprtient pas à la liste.
+          content:
+            application/json: {}
+        "404":
+          description: >-
+            Tableau non trouvé.
+            Liste non trouvée.
+            Carte non trouvée"
+          content:
+            application/json: {}
+    put:
+      tags:
+        - Cartes
+      summary: Modifier une carte
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CarteItem"
+      parameters:
+        - name: tableauId
+          in: path
+          description: "Identifiant du tableau"
+          schema:
+            type: string
+          required: true
+        - name: listeId
+          in: path
+          description: "Identifiant de la liste"
+          schema:
+            type: string
+          required: true
+        - name: carteId
+          description: "Identifiant de la carte"
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        "201":
+          description: "Carte modifiée"
+          content:
+            application/json: {}
+        "400":
+          description: "Champ manquant, erreur de validation"
+          content:
+            application/json: {}
+        "403":
+          description: >-
+            Utilisateur non propriétaire du tableau.
+            Liste n'apartient pas au tableau.
+            Carte n'aprtient pas à la liste.
+          content:
+            application/json: {}
+        "404":
+          description: >-
+            Tableau non trouvé.
+            Liste non trouvée.
+            Carte non trouvée"
+
+          content:
+            application/json: {}
+    delete:
+      tags:
+        - Cartes
+      summary: Supprimer une Carte
+      parameters:
+        - name: tableauId
+          in: path
+          schema:
+            type: string
+          required: true
+        - name: listeId
+          in: path
+          schema:
+            type: string
+          required: true
+        - name: carteId
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        "200":
+          description: "Carte supprimée"
+          content:
+            application/json: {}
+        "400":
+          description: "Champ manquant, erreur de validation"
+          content:
+            application/json: {}
+        "403":
+          description: >-
+            Utilisateur non propriétaire du tableau.
+            Liste n'apartient pas au tableau.
+            Carte n'aprtient pas à la liste.
+          content:
+            application/json: {}
+        "404":
+          description: >-
+            Tableau non trouvé.
+            Liste non trouvée.
+            Carte non trouvée"
+          content:
+            application/json: {}
+
+components:
+  schemas:
+    CarteItem:
+      type: object
+      required:
+        - titre
+        - description
+        - dateLimite
+      properties:
+        titre:
+          type: string
+          example: "Carte 1"
+        description:
+          type: string
+          example:
+            - "Description de la carte 1"
+            - " "
+        dateLimite:
+          type: string
+          example:
+            - "2023-05-26T01:35:27.070Z"
+            - "null"
+
+    TableauItem:
+      type: object
+      required:
+        - titre
+      properties:
+        titre:
+          type: string
+          example: Tableau 1
+
+    ListeItem:
+      type: object
+      required:
+        - titre
+      properties:
+        titre:
+          type: string
+          example: Liste 1
