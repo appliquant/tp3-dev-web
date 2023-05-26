@@ -1,7 +1,7 @@
 openapi: 3.0.0
 servers:
   - description: Lien de l'API
-    url: https://xxx.render.com
+    url: https://tp3-dev-web.onrender.com/
 
 info:
   version: 1.0.0-oas3.1
