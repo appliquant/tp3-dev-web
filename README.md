@@ -18,5 +18,5 @@ Api : https://tp3-dev-web.onrender.com/api-docs/
 1. Aller dans le dossier taches-app `cd public/taches-app`
 2. Installer les dépendances `npm install`
 3. Pour lancer l'application localement, changer les valeurs dans `public/taches-app/.env`
-   1. Changer `VITE_API_URL` pour le lien de l'API. Par exemple, `VITE_API_URL=localhost:3000/` (avec un **/** à la fin)
+   1. Changer `VITE_API_URL` pour le lien de l'API. Par exemple, `VITE_API_URL=http://localhost:3000`
 4. Lancer l'application `npm run dev`
