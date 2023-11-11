@@ -1,6 +1,6 @@
 # Application de gestions de tâches
 
-Api : https://tp3-dev-web.onrender.com/api-docs/
+https://github.com/appliquant/tp3-dev-web/assets/29934021/6ad2226d-f58c-461f-83b9-d7e5506e975d
 
 ## Installation
 
